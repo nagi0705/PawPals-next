@@ -6,13 +6,27 @@ let users = [
   { id: 2, name: "鈴木 花子", email: "hanako@example.com" },
 ];
 
-// PATCHリクエストの処理（部分更新）
+// GETリクエストの処理（ユーザーIDによる取得）
+export async function GET(req, { params }) {
+  const { id } = params;
+  const user = users.find((user) => user.id === parseInt(id, 10));
+
+  if (!user) {
+    return new Response(JSON.stringify({ error: "User not found" }), {
+      status: 404,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  return NextResponse.json(user);
+}
+
+// PATCHリクエストの処理（ユーザー情報の更新）
 export async function PATCH(req, { params }) {
   const { id } = params;
   const body = await req.json();
-
-  // ユーザーの検索
   const userIndex = users.findIndex((u) => u.id === parseInt(id, 10));
+
   if (userIndex === -1) {
     return new Response(JSON.stringify({ error: "User not found" }), {
       status: 404,
@@ -20,7 +34,6 @@ export async function PATCH(req, { params }) {
     });
   }
 
-  // ユーザー情報の更新
   users[userIndex] = {
     ...users[userIndex],
     name: body.name || users[userIndex].name,
@@ -28,27 +41,4 @@ export async function PATCH(req, { params }) {
   };
 
   return NextResponse.json(users[userIndex]);
-}
-
-// DELETEリクエストの処理（ユーザー削除）
-export async function DELETE(req, { params }) {
-  const { id } = params;
-
-  // ユーザーを検索
-  const userIndex = users.findIndex((user) => user.id === parseInt(id, 10));
-
-  if (userIndex === -1) {
-    return new Response(JSON.stringify({ error: "User not found" }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  // ユーザーを削除
-  const deletedUser = users.splice(userIndex, 1)[0];
-
-  return NextResponse.json({
-    message: "User deleted successfully",
-    deletedUser,
-  });
 }
