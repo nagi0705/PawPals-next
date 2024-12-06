@@ -11,8 +11,9 @@ const account = new Account(client);
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { email, password } = req.body; // email と password を取得
+    const { name, email, password } = req.body; // name, email, password を取得
     
+    console.log('Received name:', name);
     console.log('Received email:', email);
     console.log('Received password:', password);
     console.log('Request body:', req.body);
