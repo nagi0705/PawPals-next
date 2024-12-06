@@ -1,11 +1,8 @@
-// pages/api/auth/signup.js
 import { Client, Account, ID } from 'appwrite';
 
 const client = new Client()
   .setEndpoint('https://cloud.appwrite.io/v1')
   .setProject('675183a100255c6c9a3f');
-  // .setEndpoint(process.env.APPWRITE_ENDPOINT)
-  // .setProject(process.env.APPWRITE_PROJECT_ID);
 
 const account = new Account(client);
 
@@ -19,13 +16,13 @@ export default async function handler(req, res) {
     console.log('Request body:', req.body);
 
     // 必須フィールドの確認
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+    if (!email || !password || !name) { // nameも必須に追加
+      return res.status(400).json({ error: 'Email, password, and name are required' });
     }
 
     try {
       // AppwriteのcreateUserメソッドを使用してユーザー登録
-      const user = await account.create(ID.unique(), email, password);
+      const user = await account.create(ID.unique(), email, password, name); // nameを追加
       res.status(201).json(user);  // 成功時
     } catch (error) {
       console.error('サインアップエラー:', error); // エラーの詳細をログに出力
