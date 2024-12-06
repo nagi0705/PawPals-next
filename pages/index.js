@@ -1,7 +1,14 @@
-// pages/index.js
-import Link from 'next/link';
+import Link from 'next/link';  
+import { useSession } from 'next-auth/react'; // クライアントサイドでセッション管理
 
 export default function Home() {
+  const { data: session } = useSession();
+
+  // ログインしている場合は/topページにリダイレクト
+  if (session) {
+    window.location.href = '/top';
+  }
+
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="text-center">

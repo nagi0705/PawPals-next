@@ -1,35 +1,39 @@
-import { useState } from 'react';
+// pages/auth/signup.js
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [error, setError] = useState(null);  // エラーメッセージ用のステート
+  const [error, setError] = useState(null);
   const router = useRouter();
+  const { data: session } = useSession(); // セッション情報を取得
+
+  // ログイン状態でアクセスしている場合、/top にリダイレクト
+  useEffect(() => {
+    if (session) {
+      router.push('/top'); // 既にサインインしていれば、トップページにリダイレクト
+    }
+  }, [session]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    console.log('Email:', email, 'Password:', password, 'Name:', name); // デバッグ用ログ
 
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password, name }),  // nameを追加
+      body: JSON.stringify({ email, password, name }),
     });
-    console.log('Request body:', JSON.stringify({ email, password, name }));
 
     if (res.ok) {
-      // サインアップ成功後にホームページにリダイレクト
-      router.push('/');  // ホームページにリダイレクト（必要に応じて変更）
-      console.log('サインアップ成功');
+      router.push('/top'); // サインアップ成功後にトップページにリダイレクト
     } else {
-      // エラー処理
       const errorData = await res.json();
       setError(errorData.error || 'サインアップに失敗しました');
-      console.error('サインアップエラー:', errorData.error);
     }
   };
 
@@ -60,7 +64,7 @@ const Signup = () => {
         <button type="submit">サインアップ</button>
       </form>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}  {/* エラーメッセージの表示 */}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 };
