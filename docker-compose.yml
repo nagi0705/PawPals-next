@@ -1,0 +1,39 @@
+services:
+  appwrite:
+    image: appwrite/appwrite:latest
+    container_name: appwrite
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - appwrite-data:/storage
+      - appwrite-uploads:/storage/uploads
+    environment:
+      _APP_ENV: "production"
+      _APP_OPENSSL_KEY_V1: "8990871e8fffa8c3d0b87aca3680577764617b618682946fb61fbe174cf5297c"
+      _APP_DOMAIN: "localhost"
+      _APP_DOMAIN_TARGET: "http://localhost"
+      _APP_DB_HOST: "mariadb"  # MariaDBホスト名
+      _APP_REDIS_HOST: "redis" # Redisホスト名
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"   # MariaDBのルートパスワード
+      MYSQL_DATABASE: "appwrite"   # 使用するデータベース名
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+
+volumes:
+  appwrite-data:
+  appwrite-uploads:
+  mariadb-data:
