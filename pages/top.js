@@ -1,12 +1,21 @@
 // pages/top.js
 import Link from 'next/link';
-import { getSession } from 'next-auth/react'; // セッション情報を取得
+import { getSession, signOut } from 'next-auth/react'; // signOutを追加
 
 const Top = ({ session }) => {
   // ログインしていない場合は、indexページにリダイレクト
   if (!session) {
     return <p>ログインしてください...</p>; // サーバーサイドでリダイレクトさせます
   }
+
+  // ログアウト処理を追加
+  const handleLogout = async () => {
+    try {
+      await signOut({ redirect: true, callbackUrl: '/' });
+    } catch (error) {
+      console.error('ログアウトエラー:', error);
+    }
+  };
 
   return (
     <div>
@@ -22,6 +31,14 @@ const Top = ({ session }) => {
           </li>
         </ul>
       </div>
+
+      {/* ログアウトボタンを追加 */}
+      <button
+        onClick={handleLogout}
+        className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+      >
+        ログアウト
+      </button>
     </div>
   );
 };

@@ -1,40 +1,39 @@
 // pages/auth/signin.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';  // セッション情報を取得
+import { useSession, signIn } from 'next-auth/react';  // signInを追加
 
 const Signin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const router = useRouter();
-  const { data: session } = useSession();  // セッション情報を取得
+  const { data: session } = useSession();
 
-  // ログイン状態でアクセスしている場合、/top にリダイレクト
   useEffect(() => {
     if (session) {
-      router.push('/top');  // 既にサインインしていれば、トップページにリダイレクト
+      router.push('/top');
     }
-  }, [session]);
+  }, [session, router]);
 
   const handleSignin = async (e) => {
     e.preventDefault();
 
-    const res = await fetch('/api/auth/signin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),  // メールとパスワードを送信
-    });
+    try {
+      // NextAuthのsignIn関数を使用
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false
+      });
 
-    if (res.ok) {
-      // サインイン成功後、トップページにリダイレクト
-      router.push('/top');
-    } else {
-      // サインインエラー
-      const errorData = await res.json();
-      setError(errorData.error || 'サインインに失敗しました');
+      if (result.error) {
+        setError('ログインに失敗しました');
+      } else {
+        router.push('/top');
+      }
+    } catch (error) {
+      setError('ログイン処理中にエラーが発生しました');
     }
   };
 

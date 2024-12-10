@@ -1,7 +1,7 @@
 // pages/auth/signup.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -9,31 +9,46 @@ const Signup = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState(null);
   const router = useRouter();
-  const { data: session } = useSession(); // セッション情報を取得
+  const { data: session } = useSession();
 
-  // ログイン状態でアクセスしている場合、/top にリダイレクト
   useEffect(() => {
     if (session) {
-      router.push('/top'); // 既にサインインしていれば、トップページにリダイレクト
+      router.push('/top');
     }
-  }, [session]);
+  }, [session, router]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password, name }),
-    });
+    try {
+      // 1. まずサインアップ
+      const signupRes = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, name }),
+      });
 
-    if (res.ok) {
-      router.push('/top'); // サインアップ成功後にトップページにリダイレクト
-    } else {
-      const errorData = await res.json();
-      setError(errorData.error || 'サインアップに失敗しました');
+      if (!signupRes.ok) {
+        const errorData = await signupRes.json();
+        throw new Error(errorData.error || 'サインアップに失敗しました');
+      }
+
+      // 2. サインアップ成功後、自動的にログイン
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result.error) {
+        setError('ログインに失敗しました');
+      } else {
+        router.push('/top');
+      }
+    } catch (error) {
+      setError(error.message);
     }
   };
 
