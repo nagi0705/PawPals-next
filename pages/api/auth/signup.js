@@ -1,34 +1,38 @@
-import { Client, Account, ID } from 'appwrite';
+import { Client, Account, ID, Databases } from 'appwrite';
 
 const client = new Client()
   .setEndpoint('https://cloud.appwrite.io/v1')
   .setProject('675183a100255c6c9a3f');
 
 const account = new Account(client);
+const databases = new Databases(client);
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { name, email, password } = req.body; // name, email, password を取得
-    
-    console.log('Received name:', name);
-    console.log('Received email:', email);
-    console.log('Received password:', password);
-    console.log('Request body:', req.body);
-
-    // 必須フィールドの確認
-    if (!email || !password || !name) { // nameも必須に追加
-      return res.status(400).json({ error: 'Email, password, and name are required' });
-    }
+    const { name, email, password } = req.body;
 
     try {
-      // AppwriteのcreateUserメソッドを使用してユーザー登録
-      const user = await account.create(ID.unique(), email, password, name); // nameを追加
-      res.status(201).json(user);  // 成功時
+      // 1. Appwriteでユーザーアカウントを作成
+      const user = await account.create(ID.unique(), email, password, name);
+
+      // 2. ユーザーコレクションにデータを保存
+      const userDoc = await databases.createDocument(
+        '6751bd2800009a139bb8',
+        '6751bf630013fb0750e9',
+        user.$id,  // ユーザーIDをドキュメントIDとして使用
+        {
+          name: name,
+          email: email,
+          createdAt: new Date().toISOString()
+        }
+      );
+
+      res.status(201).json({ user, userDoc });
     } catch (error) {
-      console.error('サインアップエラー:', error); // エラーの詳細をログに出力
-      res.status(400).json({ error: error.message });  // エラー時
+      console.error('サインアップエラー:', error);
+      res.status(400).json({ error: error.message });
     }
   } else {
-    res.status(405).json({ error: 'Method not allowed' });  // 他のHTTPメソッドは拒否
+    res.status(405).json({ error: 'Method not allowed' });
   }
 }
