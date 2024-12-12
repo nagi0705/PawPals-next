@@ -19,7 +19,7 @@ const Top = ({ session }) => {
 
   return (
     <div>
-      <h1>ようこそ、{session.user.name}さん！</h1>
+      <h1>PawPalsで遊ぼう❣️</h1>
       <p>ここはトップページです。</p>
 
       {/* ユーザー一覧ページへのリンク */}
@@ -28,6 +28,15 @@ const Top = ({ session }) => {
         <ul>
           <li>
             <Link href="/users">他の仲間を見てみよう！</Link>
+          </li>
+          <li>
+            <Link href="/groups">仲間とグループでチャットしよう！</Link>
+          </li>
+          <li>
+            <Link href="/pets">ペットを登録しよう！</Link>
+          </li>
+          <li>
+            <Link href="/posts">ペット自慢&他のペットも見てみよう！</Link>
           </li>
         </ul>
       </div>
