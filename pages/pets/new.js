@@ -16,14 +16,17 @@ export default function NewPet() {
   const [loading, setLoading] = useState(false);
   const [petCount, setPetCount] = useState(0);
 
-  // ユーザーのペット数を取得
   useEffect(() => {
     const fetchPetCount = async () => {
       if (session) {
         try {
           const response = await fetch('/api/pets');
-          const pets = await response.json();
-          const userPets = pets.filter(pet => pet.userId === session.user.id);
+          const data = await response.json();
+          if (!Array.isArray(data)) {
+            setPetCount(0);
+            return;
+          }
+          const userPets = data.filter(pet => pet.userId === session.user.id);
           setPetCount(userPets.length);
         } catch (error) {
           console.error('Error fetching pet count:', error);
@@ -34,7 +37,6 @@ export default function NewPet() {
     fetchPetCount();
   }, [session]);
 
-  // 認証チェック
   if (status === 'loading') {
     return <div className="p-4">読み込み中...</div>;
   }
@@ -49,7 +51,6 @@ export default function NewPet() {
     );
   }
 
-  // ペット数が10匹以上の場合
   if (petCount >= 10) {
     return (
       <div className="container mx-auto p-4">
@@ -63,33 +64,36 @@ export default function NewPet() {
     );
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-      const response = await fetch('/api/pets', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+  try {
+    const response = await fetch('/api/pets/new', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...formData,
+        userId: session.user.id,  // ここでユーザーIDを追加
+      }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || 'ペットの登録に失敗しました');
-      }
-
-      router.push('/pets');
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error(data.message || 'ペットの登録に失敗しました');
     }
-  };
+
+    router.push('/pets');
+  } catch (error) {
+    setError(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
