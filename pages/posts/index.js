@@ -42,12 +42,12 @@ export default function Posts() {
       <ul>
         {posts.map((post) => (
           <li key={post.$id} style={{ marginBottom: '10px' }}>
-            {/* Next.js Linkの正しい使い方 */}
+            {/* 投稿内容のみ表示 */}
             <Link
               href={`/posts/${post.$id}`}
               style={{ textDecoration: 'none', color: 'blue', cursor: 'pointer' }}
             >
-              {post.content} - ペットID: {post.petId}
+              {post.content}
             </Link>
           </li>
         ))}

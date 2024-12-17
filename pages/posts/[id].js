@@ -6,10 +6,10 @@ export default function PostDetail() {
   const [post, setPost] = useState(null);
   const [error, setError] = useState(null);
   const [session, setSession] = useState(null);
+  const [likes, setLikes] = useState([]);
   const router = useRouter();
-  const { id } = router.query; // URLからidを取得
+  const { id } = router.query;
 
-  // 認証情報の取得と投稿データの取得
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -25,8 +25,8 @@ export default function PostDetail() {
 
         const data = await res.json();
         setPost(data);
+        setLikes(data.likes || []); // likesがない場合は空配列に設定
       } catch (err) {
-        console.error(err);
         setError(err.message);
       }
     };
@@ -34,29 +34,23 @@ export default function PostDetail() {
     if (id) fetchPost();
   }, [id, router]);
 
-  // 投稿削除処理
-  const handleDelete = async () => {
-    if (!confirm('本当にこの投稿を削除しますか？')) return;
+  const handleLike = async () => {
+  try {
+    const method = likes.includes(session.user.id) ? 'DELETE' : 'POST';
+    const res = await fetch(`/api/posts/${id}/like`, { method });
+    if (!res.ok) throw new Error('いいねの操作に失敗しました');
 
-    try {
-      const res = await fetch(`/api/posts/${id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error('投稿の削除に失敗しました');
-
-      alert('投稿が削除されました');
-      router.push('/posts');
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    }
-  };
+    const data = await res.json();
+    setLikes(data.likes); // いいね数を更新
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
   if (!post) return <p>読み込み中...</p>;
 
-  // 現在のユーザーが投稿者かどうかを確認
-  const isOwner = session?.user.id === post.userId;
+  const isLiked = likes.includes(session?.user.id);
 
   return (
     <div>
@@ -64,20 +58,21 @@ export default function PostDetail() {
       <h2>{post.content}</h2>
       <p>ユーザーID: {post.userId}</p>
       <p>作成日: {new Date(post.createdAt).toLocaleString()}</p>
-      <p>更新日: {new Date(post.updatedAt).toLocaleString()}</p>
+      <p>いいね数: {likes.length}</p>
 
-      {/* 投稿者のみ表示 */}
-      {isOwner && (
-        <div style={{ marginTop: '10px' }}>
-          <button onClick={() => router.push(`/posts/${id}/edit`)}>編集する</button>
-          <button
-            onClick={handleDelete}
-            style={{ marginLeft: '10px', color: 'red' }}
-          >
-            削除する
-          </button>
-        </div>
-      )}
+      {/* ハートボタン */}
+      <button
+        onClick={handleLike}
+        style={{
+          backgroundColor: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: '1.5rem',
+          color: isLiked ? 'red' : 'gray',
+        }}
+      >
+        {isLiked ? '❤️' : '🤍'}
+      </button>
 
       <div style={{ marginTop: '10px' }}>
         <button onClick={() => router.push('/posts')}>一覧へ戻る</button>
