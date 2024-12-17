@@ -35,28 +35,49 @@ export default function PostDetail() {
   }, [id, router]);
 
   const handleLike = async () => {
-  try {
-    const method = likes.includes(session.user.id) ? 'DELETE' : 'POST';
-    const res = await fetch(`/api/posts/${id}/like`, { method });
-    if (!res.ok) throw new Error('いいねの操作に失敗しました');
+    try {
+      const method = likes.includes(session.user.id) ? 'DELETE' : 'POST';
+      const res = await fetch(`/api/posts/${id}/like`, { method });
+      if (!res.ok) throw new Error('いいねの操作に失敗しました');
 
-    const data = await res.json();
-    setLikes(data.likes); // いいね数を更新
-  } catch (err) {
-    console.error(err);
-  }
-};
+      const data = await res.json();
+      setLikes(data.likes); // いいね数を更新
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEdit = () => {
+    router.push(`/posts/${id}/edit`);
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('本当にこの投稿を削除しますか？')) return;
+
+    try {
+      const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('投稿の削除に失敗しました');
+
+      alert('投稿を削除しました');
+      router.push('/posts');
+    } catch (err) {
+      console.error(err);
+      alert('エラーが発生しました');
+    }
+  };
 
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
   if (!post) return <p>読み込み中...</p>;
 
+  const isOwner = session?.user.id === post.userId; // 投稿者かどうか確認
   const isLiked = likes.includes(session?.user.id);
 
   return (
     <div>
       <h1>投稿詳細</h1>
       <h2>{post.content}</h2>
-      <p>ユーザーID: {post.userId}</p>
+      {/* ユーザー名は投稿者のみ表示 */}
+      {isOwner && <p>ユーザー名: {post.userName}</p>}
       <p>作成日: {new Date(post.createdAt).toLocaleString()}</p>
       <p>いいね数: {likes.length}</p>
 
@@ -73,6 +94,18 @@ export default function PostDetail() {
       >
         {isLiked ? '❤️' : '🤍'}
       </button>
+
+      {/* 編集・削除ボタン（投稿者のみ表示） */}
+      {isOwner && (
+        <div style={{ marginTop: '10px' }}>
+          <button onClick={handleEdit} style={{ marginRight: '10px' }}>
+            編集
+          </button>
+          <button onClick={handleDelete} style={{ color: 'red' }}>
+            削除
+          </button>
+        </div>
+      )}
 
       <div style={{ marginTop: '10px' }}>
         <button onClick={() => router.push('/posts')}>一覧へ戻る</button>

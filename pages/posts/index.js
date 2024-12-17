@@ -52,6 +52,15 @@ export default function Posts() {
           </li>
         ))}
       </ul>
+
+      {/* トップページに戻るボタン */}
+      <div style={{ marginTop: '20px' }}>
+        <Link href="/top">
+          <button style={{ padding: '10px 20px', cursor: 'pointer' }}>
+            トップページへ戻る
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }
