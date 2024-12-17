@@ -1,66 +1,64 @@
-import { Client, Databases, ID, Query } from 'appwrite';
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { Client, Databases, ID } from 'appwrite'; // IDを追加
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/pages/api/auth/[...nextauth]';
 
 export default async function handler(req, res) {
+  // 認証セッションの確認
   const session = await getServerSession(req, res, authOptions);
-
   if (!session) {
     return res.status(401).json({ message: '認証が必要です' });
   }
 
+  // Appwriteクライアントのセットアップ
   const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('675183a100255c6c9a3f');
+    .setEndpoint('https://cloud.appwrite.io/v1') // Appwriteのエンドポイント
+    .setProject('675183a100255c6c9a3f'); // プロジェクトID
 
   const databases = new Databases(client);
-  const databaseId = '6751bd2800009a139bb8';
-  const postsCollectionId = '675689f200161a70d144';
+  const databaseId = '6751bd2800009a139bb8'; // データベースID
+  const postsCollectionId = '675689f200161a70d144'; // コレクションID
 
   try {
     switch (req.method) {
-      case 'GET':
-        const posts = await databases.listDocuments(
-          databaseId,
-          postsCollectionId,
-          [
-            Query.orderDesc('createdAt'), // 新しい投稿順
-            Query.limit(50) // 一度に取得する投稿数を制限
-          ]
-        );
-        
-        return res.status(200).json(posts);
+      case 'GET': {
+        // GETリクエスト: 投稿データ一覧を取得
+        const posts = await databases.listDocuments(databaseId, postsCollectionId, []);
+        return res.status(200).json(posts.documents);
+      }
 
-      case 'POST':
-        const { content, petId } = req.body;
-        
-        if (!content || !petId) {
-          return res.status(400).json({ 
-            message: '投稿内容とペットIDは必須です' 
-          });
+      case 'POST': {
+        const { content } = req.body;
+
+        if (!content) {
+          return res.status(400).json({ message: '投稿内容は必須です' });
         }
 
+        // Appwriteの自動生成IDを使用
         const post = await databases.createDocument(
           databaseId,
           postsCollectionId,
-          ID.unique(),
+          ID.unique(), // Appwriteが自動でID生成
           {
             content,
-            petId,
-            userId: session.user.id,
+            userId: session.user.id, // 認証済みユーザーID
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
           }
         );
-        
-        return res.status(201).json(post);
 
-      default:
+        return res.status(201).json(post);
+      }
+
+      default: {
         res.setHeader('Allow', ['GET', 'POST']);
         return res.status(405).json({ message: `Method ${req.method} Not Allowed` });
+      }
     }
   } catch (error) {
-    console.error('Error:', error);
-    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    console.error('Error:', error); // エラーログの詳細を表示
+    return res.status(500).json({
+      message: 'Internal Server Error',
+      error: error.message,
+    });
   }
 }
