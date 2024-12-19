@@ -7,71 +7,44 @@ export default function PostDetail() {
   const [post, setPost] = useState(null);
   const [error, setError] = useState(null);
   const [session, setSession] = useState(null);
-  const [likes, setLikes] = useState([]);
+  const [likes, setLikes] = useState([]); // 投稿のいいねリスト
   const [comments, setComments] = useState([]); // コメント一覧
   const router = useRouter();
   const { id } = router.query;
 
-  // コメント編集・削除用関数
-  const handleEditComment = (comment) => {
-    setComments((prevComments) =>
-      prevComments.map((c) =>
-        c.$id === comment.$id ? { ...c, isEditing: true, editContent: c.content } : c
-      )
-    );
+  const handleLikePost = async () => {
+    try {
+      const method = likes.includes(session.user.id) ? 'DELETE' : 'POST';
+      const res = await fetch(`/api/posts/${id}/like`, { method });
+      if (!res.ok) throw new Error('いいねの操作に失敗しました');
+
+      const data = await res.json();
+      setLikes(data.likes);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleEditChange = (commentId, newContent) => {
-    setComments((prevComments) =>
-      prevComments.map((c) =>
-        c.$id === commentId ? { ...c, editContent: newContent } : c
-      )
-    );
-  };
-
-  const handleSaveEdit = async (commentId) => {
-    const commentToUpdate = comments.find((c) => c.$id === commentId);
-    if (!commentToUpdate) return;
-
+  const handleLikeComment = async (commentId, isLiked) => {
     try {
       const res = await fetch(`/api/comments/${commentId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: commentToUpdate.editContent }),
+        body: JSON.stringify({ like: !isLiked, userId: session?.user?.id }),
       });
 
       if (!res.ok) {
-        throw new Error('コメントの更新に失敗しました');
+        throw new Error('コメントへのいいね操作に失敗しました');
       }
 
       const updatedComment = await res.json();
       setComments((prevComments) =>
-        prevComments.map((c) =>
-          c.$id === commentId
-            ? { ...c, content: updatedComment.content, isEditing: false, editContent: '' }
-            : c
+        prevComments.map((comment) =>
+          comment.$id === updatedComment.$id ? updatedComment : comment
         )
       );
     } catch (error) {
-      console.error('コメント更新エラー:', error.message);
-    }
-  };
-
-  const handleDeleteComment = async (commentId) => {
-    if (!confirm('本当にこのコメントを削除しますか？')) return;
-
-    try {
-      const res = await fetch(`/api/comments/${commentId}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) {
-        throw new Error('コメントの削除に失敗しました');
-      }
-
-      setComments((prevComments) => prevComments.filter((c) => c.$id !== commentId));
-    } catch (error) {
-      console.error('コメント削除エラー:', error.message);
+      console.error('コメントいいねエラー:', error.message);
     }
   };
 
@@ -79,7 +52,6 @@ export default function PostDetail() {
     const fetchPost = async () => {
       try {
         const userSession = await getSession();
-        console.log('取得したセッション:', userSession); // デバッグ用ログ
         if (!userSession) {
           router.push('/api/auth/signin');
           return;
@@ -115,161 +87,64 @@ export default function PostDetail() {
     }
   }, [id, router]);
 
-  const handleLike = async () => {
-    try {
-      const method = likes.includes(session.user.id) ? 'DELETE' : 'POST';
-      const res = await fetch(`/api/posts/${id}/like`, { method });
-      if (!res.ok) throw new Error('いいねの操作に失敗しました');
-
-      const data = await res.json();
-      setLikes(data.likes);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleEdit = () => {
-    router.push(`/posts/${id}/edit`);
-  };
-
-  const handleDelete = async () => {
-    if (!confirm('本当にこの投稿を削除しますか？')) return;
-
-    try {
-      const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('投稿の削除に失敗しました');
-
-      alert('投稿を削除しました');
-      router.push('/posts');
-    } catch (err) {
-      console.error(err);
-      alert('エラーが発生しました');
-    }
-  };
-
-  const handleCommentAdded = (newComment) => {
-    setComments((prev) => [...prev, newComment]);
-  };
-
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
   if (!post) return <p>読み込み中...</p>;
 
-  const isOwner = session?.user.id === post.userId;
-  const isLiked = likes.includes(session?.user.id);
+  const isPostLiked = likes.includes(session?.user.id);
 
   return (
     <div>
       <h1>投稿詳細</h1>
       <h2>{post.content}</h2>
-      {isOwner && <p>ユーザー名: {post.userName}</p>}
       <p>作成日: {new Date(post.createdAt).toLocaleString()}</p>
       <p>いいね数: {likes.length}</p>
 
       <button
-        onClick={handleLike}
+        onClick={handleLikePost}
         style={{
           backgroundColor: 'transparent',
           border: 'none',
           cursor: 'pointer',
           fontSize: '1.5rem',
-          color: isLiked ? 'red' : 'gray',
+          color: isPostLiked ? 'red' : 'gray',
         }}
       >
-        {isLiked ? '❤️' : '🤍'}
+        {isPostLiked ? '❤️' : '🤍'}
       </button>
 
-      {isOwner && (
-        <div style={{ marginTop: '10px' }}>
-          <button onClick={handleEdit} style={{ marginRight: '10px' }}>
-            編集
-          </button>
-          <button onClick={handleDelete} style={{ color: 'red' }}>
-            削除
-          </button>
-        </div>
-      )}
-
-      <div style={{ marginTop: '10px' }}>
-        <button onClick={() => router.push('/posts')} style={{ marginBottom: '20px' }}>
-          投稿一覧に戻る
-        </button>
-      </div>
-
-      {/* コメントフォーム */}
       <CommentForm
         postId={post?.$id}
-        onCommentAdded={handleCommentAdded}
-        authorId={session?.user?.id} // authorId を渡す
+        onCommentAdded={(newComment) =>
+          setComments((prev) => [...prev, newComment])
+        }
+        authorId={session?.user?.id}
       />
-      {/* コメント一覧 */}
+
       <div style={{ marginTop: '20px' }}>
         <h3>コメント一覧</h3>
         {comments.length > 0 ? (
           comments.map((comment) => {
-            const isCommentOwner = comment.authorId === session?.user?.id;
+            const isLiked = comment.likes?.includes(session?.user?.id);
 
             return (
-              <div
-                key={comment.$id}
-                style={{
-                  border: '1px solid #ccc',
-                  padding: '10px',
-                  marginBottom: '10px',
-                }}
-              >
-                {isCommentOwner && (
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <button
-                      onClick={() => handleEditComment(comment)}
-                      style={{
-                        marginRight: '10px',
-                        background: 'blue',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '5px 10px',
-                      }}
-                    >
-                      編集
-                    </button>
-                    <button
-                      onClick={() => handleDeleteComment(comment.$id)}
-                      style={{
-                        background: 'red',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '5px 10px',
-                      }}
-                    >
-                      削除
-                    </button>
-                  </div>
-                )}
-                {comment.isEditing ? (
-                  <textarea
-                    value={comment.editContent || comment.content}
-                    onChange={(e) =>
-                      handleEditChange(comment.$id, e.target.value)
-                    }
-                    style={{ width: '100%', marginBottom: '10px' }}
-                  />
-                ) : (
-                  <p>{comment.content}</p>
-                )}
+              <div key={comment.$id}>
+                <p>{comment.content}</p>
                 <small>{new Date(comment.createdAt).toLocaleString()}</small>
-                {comment.isEditing && (
+                <div>
                   <button
-                    onClick={() => handleSaveEdit(comment.$id)}
+                    onClick={() => handleLikeComment(comment.$id, isLiked)}
                     style={{
-                      background: 'green',
-                      color: '#fff',
+                      backgroundColor: 'transparent',
                       border: 'none',
-                      padding: '5px 10px',
-                      marginTop: '10px',
+                      cursor: 'pointer',
+                      fontSize: '1.2rem',
+                      color: isLiked ? 'red' : 'gray',
                     }}
                   >
-                    保存
+                    {isLiked ? '❤️' : '🤍'}
                   </button>
-                )}
+                  <span>{comment.likes?.length || 0} いいね</span>
+                </div>
               </div>
             );
           })
