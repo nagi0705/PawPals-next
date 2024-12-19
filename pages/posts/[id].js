@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
+import CommentForm from '../../components/CommentForm';
 
 export default function PostDetail() {
   const [post, setPost] = useState(null);
   const [error, setError] = useState(null);
   const [session, setSession] = useState(null);
   const [likes, setLikes] = useState([]);
+  const [comments, setComments] = useState([]); // コメント一覧
   const router = useRouter();
   const { id } = router.query;
 
@@ -25,13 +27,28 @@ export default function PostDetail() {
 
         const data = await res.json();
         setPost(data);
-        setLikes(data.likes || []); // likesがない場合は空配列に設定
+        setLikes(data.likes || []);
       } catch (err) {
         setError(err.message);
       }
     };
 
-    if (id) fetchPost();
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`/api/comments?postId=${id}`);
+        if (!res.ok) throw new Error('コメントの取得に失敗しました');
+
+        const data = await res.json();
+        setComments(data.comments || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (id) {
+      fetchPost();
+      fetchComments();
+    }
   }, [id, router]);
 
   const handleLike = async () => {
@@ -41,7 +58,7 @@ export default function PostDetail() {
       if (!res.ok) throw new Error('いいねの操作に失敗しました');
 
       const data = await res.json();
-      setLikes(data.likes); // いいね数を更新
+      setLikes(data.likes);
     } catch (err) {
       console.error(err);
     }
@@ -66,22 +83,24 @@ export default function PostDetail() {
     }
   };
 
+  const handleCommentAdded = (newComment) => {
+    setComments((prev) => [...prev, newComment]);
+  };
+
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
   if (!post) return <p>読み込み中...</p>;
 
-  const isOwner = session?.user.id === post.userId; // 投稿者かどうか確認
+  const isOwner = session?.user.id === post.userId;
   const isLiked = likes.includes(session?.user.id);
 
   return (
     <div>
       <h1>投稿詳細</h1>
       <h2>{post.content}</h2>
-      {/* ユーザー名は投稿者のみ表示 */}
       {isOwner && <p>ユーザー名: {post.userName}</p>}
       <p>作成日: {new Date(post.createdAt).toLocaleString()}</p>
       <p>いいね数: {likes.length}</p>
 
-      {/* ハートボタン */}
       <button
         onClick={handleLike}
         style={{
@@ -95,7 +114,6 @@ export default function PostDetail() {
         {isLiked ? '❤️' : '🤍'}
       </button>
 
-      {/* 編集・削除ボタン（投稿者のみ表示） */}
       {isOwner && (
         <div style={{ marginTop: '10px' }}>
           <button onClick={handleEdit} style={{ marginRight: '10px' }}>
@@ -108,7 +126,27 @@ export default function PostDetail() {
       )}
 
       <div style={{ marginTop: '10px' }}>
-        <button onClick={() => router.push('/posts')}>一覧へ戻る</button>
+        <button onClick={() => router.push('/posts')} style={{ marginBottom: '20px' }}>
+          投稿一覧に戻る
+        </button>
+      </div>
+
+      {/* コメントフォーム */}
+      <CommentForm postId={post?.$id} onCommentAdded={handleCommentAdded} session={session} />
+
+      {/* コメント一覧 */}
+      <div style={{ marginTop: '20px' }}>
+        <h3>コメント一覧</h3>
+        {comments.length > 0 ? (
+          comments.map((comment) => (
+            <div key={comment.$id} style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
+              <p>{comment.content}</p>
+              <small>{new Date(comment.createdAt).toLocaleString()}</small>
+            </div>
+          ))
+        ) : (
+          <p>コメントはまだありません。</p>
+        )}
       </div>
     </div>
   );
