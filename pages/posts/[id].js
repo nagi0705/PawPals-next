@@ -13,43 +13,31 @@ export default function PostDetail() {
   const { id } = router.query;
 
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const userSession = await getSession();
-        if (!userSession) {
-          router.push('/api/auth/signin');
-          return;
-        }
-        setSession(userSession);
-
-        const res = await fetch(`/api/posts/${id}`);
-        if (!res.ok) throw new Error('投稿データの取得に失敗しました');
-
-        const data = await res.json();
-        setPost(data);
-        setLikes(data.likes || []);
-      } catch (err) {
-        setError(err.message);
+  const fetchPost = async () => {
+    try {
+      const userSession = await getSession();
+      console.log('取得したセッション:', userSession); // デバッグ用ログ
+      if (!userSession) {
+        router.push('/api/auth/signin');
+        return;
       }
-    };
+      setSession(userSession);
 
-    const fetchComments = async () => {
-      try {
-        const res = await fetch(`/api/comments?postId=${id}`);
-        if (!res.ok) throw new Error('コメントの取得に失敗しました');
+      const res = await fetch(`/api/posts/${id}`);
+      if (!res.ok) throw new Error('投稿データの取得に失敗しました');
 
-        const data = await res.json();
-        setComments(data.comments || []);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    if (id) {
-      fetchPost();
-      fetchComments();
+      const data = await res.json();
+      setPost(data);
+      setLikes(data.likes || []);
+    } catch (err) {
+      setError(err.message);
     }
-  }, [id, router]);
+  };
+
+  if (id) {
+    fetchPost();
+  }
+}, [id, router]);
 
   const handleLike = async () => {
     try {
@@ -132,9 +120,12 @@ export default function PostDetail() {
       </div>
 
       {/* コメントフォーム */}
-      <CommentForm postId={post?.$id} onCommentAdded={handleCommentAdded} session={session} />
-
-      {/* コメント一覧 */}
+        <CommentForm 
+          postId={post?.$id} 
+          onCommentAdded={handleCommentAdded} 
+          authorId={session?.user?.id} // authorId を渡す
+        />
+        {/* コメント一覧 */}
       <div style={{ marginTop: '20px' }}>
         <h3>コメント一覧</h3>
         {comments.length > 0 ? (

@@ -7,7 +7,9 @@ export default function CommentForm({ postId, onCommentAdded, authorId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!postId || !content.trim()) {
+    console.log('受け取ったauthorId:', authorId); // デバッグ用
+
+    if (!postId || !content.trim() || !authorId) {
       setError('投稿IDまたはコメント内容が無効です');
       return;
     }
