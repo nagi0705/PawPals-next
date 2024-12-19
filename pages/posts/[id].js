@@ -12,32 +12,108 @@ export default function PostDetail() {
   const router = useRouter();
   const { id } = router.query;
 
-  useEffect(() => {
-  const fetchPost = async () => {
+  // コメント編集・削除用関数
+  const handleEditComment = (comment) => {
+    setComments((prevComments) =>
+      prevComments.map((c) =>
+        c.$id === comment.$id ? { ...c, isEditing: true, editContent: c.content } : c
+      )
+    );
+  };
+
+  const handleEditChange = (commentId, newContent) => {
+    setComments((prevComments) =>
+      prevComments.map((c) =>
+        c.$id === commentId ? { ...c, editContent: newContent } : c
+      )
+    );
+  };
+
+  const handleSaveEdit = async (commentId) => {
+    const commentToUpdate = comments.find((c) => c.$id === commentId);
+    if (!commentToUpdate) return;
+
     try {
-      const userSession = await getSession();
-      console.log('取得したセッション:', userSession); // デバッグ用ログ
-      if (!userSession) {
-        router.push('/api/auth/signin');
-        return;
+      const res = await fetch(`/api/comments/${commentId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: commentToUpdate.editContent }),
+      });
+
+      if (!res.ok) {
+        throw new Error('コメントの更新に失敗しました');
       }
-      setSession(userSession);
 
-      const res = await fetch(`/api/posts/${id}`);
-      if (!res.ok) throw new Error('投稿データの取得に失敗しました');
-
-      const data = await res.json();
-      setPost(data);
-      setLikes(data.likes || []);
-    } catch (err) {
-      setError(err.message);
+      const updatedComment = await res.json();
+      setComments((prevComments) =>
+        prevComments.map((c) =>
+          c.$id === commentId
+            ? { ...c, content: updatedComment.content, isEditing: false, editContent: '' }
+            : c
+        )
+      );
+    } catch (error) {
+      console.error('コメント更新エラー:', error.message);
     }
   };
 
-  if (id) {
-    fetchPost();
-  }
-}, [id, router]);
+  const handleDeleteComment = async (commentId) => {
+    if (!confirm('本当にこのコメントを削除しますか？')) return;
+
+    try {
+      const res = await fetch(`/api/comments/${commentId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error('コメントの削除に失敗しました');
+      }
+
+      setComments((prevComments) => prevComments.filter((c) => c.$id !== commentId));
+    } catch (error) {
+      console.error('コメント削除エラー:', error.message);
+    }
+  };
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const userSession = await getSession();
+        console.log('取得したセッション:', userSession); // デバッグ用ログ
+        if (!userSession) {
+          router.push('/api/auth/signin');
+          return;
+        }
+        setSession(userSession);
+
+        const res = await fetch(`/api/posts/${id}`);
+        if (!res.ok) throw new Error('投稿データの取得に失敗しました');
+
+        const data = await res.json();
+        setPost(data);
+        setLikes(data.likes || []);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`/api/comments?postId=${id}`);
+        if (!res.ok) throw new Error('コメントの取得に失敗しました');
+
+        const data = await res.json();
+        setComments(data.comments || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (id) {
+      fetchPost();
+      fetchComments();
+    }
+  }, [id, router]);
 
   const handleLike = async () => {
     try {
@@ -120,21 +196,83 @@ export default function PostDetail() {
       </div>
 
       {/* コメントフォーム */}
-        <CommentForm 
-          postId={post?.$id} 
-          onCommentAdded={handleCommentAdded} 
-          authorId={session?.user?.id} // authorId を渡す
-        />
-        {/* コメント一覧 */}
+      <CommentForm
+        postId={post?.$id}
+        onCommentAdded={handleCommentAdded}
+        authorId={session?.user?.id} // authorId を渡す
+      />
+      {/* コメント一覧 */}
       <div style={{ marginTop: '20px' }}>
         <h3>コメント一覧</h3>
         {comments.length > 0 ? (
-          comments.map((comment) => (
-            <div key={comment.$id} style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
-              <p>{comment.content}</p>
-              <small>{new Date(comment.createdAt).toLocaleString()}</small>
-            </div>
-          ))
+          comments.map((comment) => {
+            const isCommentOwner = comment.authorId === session?.user?.id;
+
+            return (
+              <div
+                key={comment.$id}
+                style={{
+                  border: '1px solid #ccc',
+                  padding: '10px',
+                  marginBottom: '10px',
+                }}
+              >
+                {isCommentOwner && (
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <button
+                      onClick={() => handleEditComment(comment)}
+                      style={{
+                        marginRight: '10px',
+                        background: 'blue',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '5px 10px',
+                      }}
+                    >
+                      編集
+                    </button>
+                    <button
+                      onClick={() => handleDeleteComment(comment.$id)}
+                      style={{
+                        background: 'red',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '5px 10px',
+                      }}
+                    >
+                      削除
+                    </button>
+                  </div>
+                )}
+                {comment.isEditing ? (
+                  <textarea
+                    value={comment.editContent || comment.content}
+                    onChange={(e) =>
+                      handleEditChange(comment.$id, e.target.value)
+                    }
+                    style={{ width: '100%', marginBottom: '10px' }}
+                  />
+                ) : (
+                  <p>{comment.content}</p>
+                )}
+                <small>{new Date(comment.createdAt).toLocaleString()}</small>
+                {comment.isEditing && (
+                  <button
+                    onClick={() => handleSaveEdit(comment.$id)}
+                    style={{
+                      background: 'green',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '5px 10px',
+                      marginTop: '10px',
+                    }}
+                  >
+                    保存
+                  </button>
+                )}
+              </div>
+            );
+          })
         ) : (
           <p>コメントはまだありません。</p>
         )}
