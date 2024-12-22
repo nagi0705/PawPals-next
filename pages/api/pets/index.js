@@ -1,30 +1,26 @@
 import { Client, Databases } from 'appwrite';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/[...nextauth]';
 
 export default async function handler(req, res) {
-  const session = await getServerSession(req, res, authOptions);
+  // Appwriteクライアントの初期化
+  const client = new Client()
+    .setEndpoint('https://cloud.appwrite.io/v1') // Appwrite APIエンドポイント
+    .setProject('675183a100255c6c9a3f'); // プロジェクトID
 
-  if (!session) {
-    return res.status(401).json({ message: '認証が必要です' });
-  }
+  const databases = new Databases(client);
 
+  // GET メソッドの場合のみ処理を行う
   if (req.method !== 'GET') {
     return res.status(405).json({ message: `Method ${req.method} Not Allowed` });
   }
 
-  const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT_ID);
-
-  const databases = new Databases(client);
-
   try {
+    // ペットのデータを取得
     const pets = await databases.listDocuments(
-      process.env.APPWRITE_DATABASE_ID,
-      process.env.APPWRITE_PETS_COLLECTION_ID 
+      '6751bd2800009a139bb8', // データベースID
+      '67679a6600013eb8b9ed'  // ペットコレクションID
     );
 
+    // 成功した場合、ペットデータを返す
     return res.status(200).json(pets.documents);
   } catch (error) {
     console.error('エラー:', error);
