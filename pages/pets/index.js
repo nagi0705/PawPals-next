@@ -62,8 +62,6 @@ const PetsList = () => {
         {pets.map((pet) => (
           <li key={pet.$id}>
             <h2>{pet.name}</h2>
-            <p>種別: {pet.species}</p>
-            <p>年齢: {pet.age}</p>
             <a href={`/pets/${pet.$id}`}>詳細を見る</a>
           </li>
         ))}
