@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Client, Databases } from 'appwrite';
-import { useRouter } from 'next/router'; // useRouter をインポート
+import { useRouter } from 'next/router';
 
 const PetsList = () => {
   const [pets, setPets] = useState([]);
   const [error, setError] = useState(null);
-  const router = useRouter(); // useRouter フックを使用してルーティング
+  const [searchQuery, setSearchQuery] = useState(''); // 検索クエリを保持
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPets = async () => {
@@ -13,7 +14,7 @@ const PetsList = () => {
         // Appwriteクライアントを初期化
         const client = new Client()
           .setEndpoint('https://cloud.appwrite.io/v1') // Appwriteのエンドポイント
-          .setProject('675183a100255c6c9a3f'); // ここにプロジェクトIDを設定
+          .setProject('675183a100255c6c9a3f'); // プロジェクトID
 
         const databases = new Databases(client);
 
@@ -37,9 +38,12 @@ const PetsList = () => {
     fetchPets();
   }, []);
 
-  if (error) {
-    return <p style={{ color: 'red' }}>エラー: {error}</p>;
-  }
+  // 検索クエリに基づいてペットをフィルタリング
+  const filteredPets = pets.filter(pet => 
+    pet.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    pet.species.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    pet.breed.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleAddPet = () => {
     router.push('/pets/new'); // 新規登録ページに遷移
@@ -47,6 +51,10 @@ const PetsList = () => {
 
   const handleGoHome = () => {
     router.push('/top'); // トップページに遷移
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value); // 検索入力を更新
   };
 
   return (
@@ -58,8 +66,21 @@ const PetsList = () => {
       <button onClick={handleGoHome} style={{ marginBottom: '20px', marginLeft: '10px' }}>
         トップページに戻る
       </button>
+
+      <div>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          placeholder="検索..."
+          style={{ marginBottom: '20px', padding: '8px' }}
+        />
+      </div>
+
+      {error && <p style={{ color: 'red' }}>エラー: {error}</p>}
+
       <ul>
-        {pets.map((pet) => (
+        {filteredPets.map((pet) => (
           <li key={pet.$id}>
             <h2>{pet.name}</h2>
             <a href={`/pets/${pet.$id}`}>詳細を見る</a>

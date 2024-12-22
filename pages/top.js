@@ -27,9 +27,6 @@ const Top = ({ session }) => {
         <h2>ナビゲーション</h2>
         <ul>
           <li>
-            <Link href="/users">他の仲間を見てみよう！</Link>
-          </li>
-          <li>
             <Link href="/groups">仲間とグループでチャットしよう！</Link>
           </li>
           <li>
