@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 
 const NewPostForm = () => {
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [content, setContent] =useState('');
   const [image, setImage] = useState(null); // 画像ファイル
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -21,15 +21,14 @@ const NewPostForm = () => {
     }
 
     try {
-      const response = await fetch('/api/posts', {
+      const response = await fetch('/api/posts/new', {
         method: 'POST',
-        body: formData,
+        body: formData, // FormDataをそのまま送信
       });
 
       const data = await response.json();
       if (response.ok) {
-        // 投稿成功後、投稿一覧ページにリダイレクト
-        router.push('/posts');
+        router.push('/posts'); // 投稿成功後、一覧ページにリダイレクト
       } else {
         setError(data.message || '投稿の作成に失敗しました');
       }
@@ -40,18 +39,25 @@ const NewPostForm = () => {
     }
   };
 
+  const handleBack = () => {
+    router.push('/posts'); // http://localhost:3000/posts に戻る
+  };
+
   return (
     <div>
       <h1>新規投稿</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>タイトル</label>
+          <label>タイトル (30文字以内)</label>
           <input
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value.slice(0, 30))} // 最大30文字に制限
             required
           />
+          {title.length > 30 && (
+            <p style={{ color: 'red' }}>タイトルは30文字以内にしてください。</p>
+          )}
         </div>
 
         <div>
@@ -74,9 +80,14 @@ const NewPostForm = () => {
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
-        <button type="submit" disabled={loading}>
-          {loading ? '投稿中...' : '投稿を作成'}
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button type="submit" disabled={loading}>
+            {loading ? '投稿中...' : '投稿を作成'}
+          </button>
+          <button type="button" onClick={handleBack}>
+            戻る
+          </button>
+        </div>
       </form>
     </div>
   );

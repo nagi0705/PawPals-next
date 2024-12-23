@@ -4,48 +4,56 @@ import { authOptions } from '../../auth/[...nextauth]';
 
 export default async function handler(req, res) {
   const { id } = req.query;
-
-  // セッション情報を取得
   const session = await getServerSession(req, res, authOptions);
 
   if (!session) {
     return res.status(401).json({ message: '認証が必要です' });
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: `Method ${req.method} Not Allowed` });
-  }
+  if (req.method === 'POST') {
+    const client = new Client()
+      .setEndpoint('https://cloud.appwrite.io/v1')
+      .setProject('675183a100255c6c9a3f');
 
-  const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1') // Appwriteのエンドポイント
-    .setProject('675183a100255c6c9a3f'); // プロジェクトID
-  const databases = new Databases(client);
+    const databases = new Databases(client);
 
-  try {
-    // 特定の投稿を取得
-    const response = await databases.getDocument(
-      '6751bd2800009a139bb8', // データベースID
-      '6767d981000f6f6e0cfa', // コレクションID
-      id // 投稿ID
-    );
+    try {
+      // 投稿を取得
+      const post = await databases.getDocument(
+        '6751bd2800009a139bb8',
+        '6767d981000f6f6e0cfa',
+        id
+      );
 
-    // 現在の「いいね」の数を取得
-    const currentLikes = response.likes || 0;
+      const userEmail = session.user.email;
+      const likedBy = post.likedBy || [];
+      let updatedLikes;
 
-    // 「いいね」を1増やす
-    const updatedLikes = currentLikes + 1;
+      if (likedBy.includes(userEmail)) {
+        // いいねを取り消す
+        updatedLikes = likedBy.filter((email) => email !== userEmail);
+      } else {
+        // いいねを追加
+        updatedLikes = [...likedBy, userEmail];
+      }
 
-    // 投稿の「いいね」数を更新
-    await databases.updateDocument(
-      '6751bd2800009a139bb8', // データベースID
-      '6767d981000f6f6e0cfa', // コレクションID
-      id, // 投稿ID
-      { likes: updatedLikes } // 更新するフィールド
-    );
+      // 投稿を更新
+      const updatedPost = await databases.updateDocument(
+        '6751bd2800009a139bb8',
+        '6767d981000f6f6e0cfa',
+        id,
+        {
+          likedBy: updatedLikes,
+          likes: updatedLikes.length, // いいね数を更新
+        }
+      );
 
-    return res.status(200).json({ message: 'いいねをしました', likes: updatedLikes });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'いいねの更新に失敗しました', error: err.message });
+      return res.status(200).json(updatedPost);
+    } catch (error) {
+      console.error('いいねエラー:', error);
+      return res.status(500).json({ message: 'いいね操作に失敗しました' });
+    }
+  } else {
+    res.status(405).json({ message: `Method ${req.method} Not Allowed` });
   }
 }

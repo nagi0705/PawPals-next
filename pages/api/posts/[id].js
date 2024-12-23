@@ -1,93 +1,71 @@
-// pages/api/posts/[id].js
 import { Client, Databases } from 'appwrite';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../api/auth/[...nextauth]'; // 認証用の設定をインポート
 
 export default async function handler(req, res) {
-  const { id } = req.query; // URLパラメータから投稿IDを取得
-  const session = await getServerSession(req, res, authOptions); // 現在のセッションを取得
+  const { id } = req.query; // 投稿のIDを取得
 
-  if (!session) {
-    return res.status(401).json({ message: 'ログインが必要です' }); // ログインしていない場合
+  if (!id) {
+    return res.status(400).json({ message: '投稿IDが必要です' });
   }
 
   const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('675183a100255c6c9a3f');
+    .setEndpoint('https://cloud.appwrite.io/v1') // Appwriteのエンドポイント
+    .setProject('675183a100255c6c9a3f'); // プロジェクトID
+
   const databases = new Databases(client);
 
   if (req.method === 'GET') {
     try {
-      // 特定の投稿を取得
-      const response = await databases.getDocument(
+      // 投稿データを取得
+      const post = await databases.getDocument(
+        '6751bd2800009a139bb8', // データベースID
         '6767d981000f6f6e0cfa', // コレクションID
         id // 投稿ID
       );
-
-      if (response.ownerEmail !== session.user.email) {
-        return res.status(403).json({ message: 'この投稿は編集できません' });
-      }
-
-      res.status(200).json(response); // 投稿データを返す
+      return res.status(200).json(post);
     } catch (error) {
-      res.status(500).json({ message: '投稿の取得に失敗しました' });
+      console.error('投稿取得エラー:', error);
+      return res.status(404).json({ message: '投稿の取得に失敗しました' });
     }
-  }
+  } else if (req.method === 'PATCH') {
+    const { title, content } = req.body;
 
-  if (req.method === 'PUT') {
-    const { title, content, image } = req.body;
+    if (!title || typeof title !== 'string' || title.length > 30) {
+      return res.status(400).json({ message: 'タイトルは必須で、30文字以内である必要があります。' });
+    }
+
+    if (!content || typeof content !== 'string') {
+      return res.status(400).json({ message: '内容は必須です。' });
+    }
 
     try {
-      // まず投稿を取得して、オーナーが現在のユーザーかどうかを確認
-      const response = await databases.getDocument(
+      const updatedPost = await databases.updateDocument(
+        '6751bd2800009a139bb8', // データベースID
         '6767d981000f6f6e0cfa', // コレクションID
-        id // 投稿ID
-      );
-
-      if (response.ownerEmail !== session.user.email) {
-        return res.status(403).json({ message: 'この投稿は編集できません' });
-      }
-
-      // 投稿を更新
-      const updatedResponse = await databases.updateDocument(
-        '6767d981000f6f6e0cfa', // コレクションID
-        id, // 投稿ID
+        id,
         {
-          title,
-          content,
-          image: image || null, // 画像がない場合もあるため、nullを許容
+          title: String(title),
+          content: String(content),
         }
       );
 
-      res.status(200).json(updatedResponse); // 更新した投稿データを返す
+      return res.status(200).json({ message: '投稿が更新されました', post: updatedPost });
     } catch (error) {
-      res.status(500).json({ message: '投稿の更新に失敗しました' });
+      console.error('投稿更新エラー:', error);
+      return res.status(500).json({ message: '投稿の更新に失敗しました' });
     }
-  }
-
-  if (req.method === 'DELETE') {
+  } else if (req.method === 'DELETE') {
     try {
-      // まず投稿を取得して、オーナーが現在のユーザーかどうかを確認
-      const response = await databases.getDocument(
+      await databases.deleteDocument(
+        '6751bd2800009a139bb8', // データベースID
         '6767d981000f6f6e0cfa', // コレクションID
-        id // 投稿ID
+        id
       );
-
-      if (response.ownerEmail !== session.user.email) {
-        return res.status(403).json({ message: 'この投稿は削除できません' });
-      }
-
-      // 投稿を削除
-      await databases.deleteDocument('6767d981000f6f6e0cfa', id); // 投稿IDで削除
-
-      res.status(200).json({ message: '投稿が削除されました' });
+      return res.status(200).json({ message: '投稿を削除しました' });
     } catch (error) {
-      res.status(500).json({ message: '投稿の削除に失敗しました' });
+      console.error('投稿削除エラー:', error);
+      return res.status(500).json({ message: '投稿の削除に失敗しました' });
     }
-  }
-
-  // 他のHTTPメソッドは許可しない
-  else {
-    res.status(405).json({ message: 'Method Not Allowed' });
+  } else {
+    res.status(405).json({ message: `Method ${req.method} Not Allowed` });
   }
 }
