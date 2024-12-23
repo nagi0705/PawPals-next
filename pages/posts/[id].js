@@ -121,6 +121,7 @@ const PostDetail = () => {
           <button onClick={handleDelete}>削除</button>
         </div>
       )}
+      <p>※画像は任意投稿なので、変更したい場合は新しく投稿し直してください😣</p>
       <button
         onClick={() => router.push('/posts')}
         style={{

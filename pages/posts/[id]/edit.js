@@ -93,6 +93,21 @@ const EditPost = () => {
           {loading ? '更新中...' : '更新'}
         </button>
       </form>
+      {/* 戻るボタン */}
+      <button
+        onClick={() => router.push(`/posts/${id}`)}
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: '#0070f3',
+          color: 'white',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+        }}
+      >
+        投稿詳細に戻る
+      </button>
     </div>
   );
 };
