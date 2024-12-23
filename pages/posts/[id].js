@@ -94,7 +94,20 @@ const PostDetail = () => {
       <h1>{post.title}</h1>
       <p>{post.content}</p>
       {post.image ? (
-        <img src={post.image} alt={post.title} style={{ maxWidth: '100%' }} />
+        <div style={{ textAlign: 'center', margin: '20px 0' }}>
+          <img
+            src={post.image}
+            alt={post.title}
+            style={{
+              maxWidth: '500px', // 横幅を最大500pxに制限
+              maxHeight: '300px', // 縦幅を最大300pxに制限
+              width: 'auto', // アスペクト比を保つ
+              height: 'auto', // アスペクト比を保つ
+              borderRadius: '10px', // 角を少し丸くする
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // 少し影をつける
+            }}
+          />
+        </div>
       ) : (
         <p>画像はありません</p>
       )}
@@ -108,6 +121,20 @@ const PostDetail = () => {
           <button onClick={handleDelete}>削除</button>
         </div>
       )}
+      <button
+        onClick={() => router.push('/posts')}
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: '#0070f3',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+        }}
+      >
+        一覧に戻る
+      </button>
     </div>
   );
 };
