@@ -1,29 +1,47 @@
-// pages/posts/index.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 const PostsList = () => {
   const [posts, setPosts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(''); // 検索クエリの状態
   const [error, setError] = useState(null);
   const router = useRouter();
 
   // 投稿データの取得
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch('/api/posts');
-        const data = await response.json();
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch('/api/posts');
+      const data = await response.json();
 
-        if (response.ok) {
-          setPosts(data);
-        } else {
-          setError(data.message || '投稿データの取得に失敗しました');
-        }
-      } catch (err) {
-        setError(err.message);
+      if (response.ok) {
+        setPosts(data);
+      } else {
+        setError(data.message || '投稿データの取得に失敗しました');
       }
-    };
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
+  // 検索機能
+  const handleSearch = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`/api/posts/search?query=${searchQuery}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setPosts(data);
+      } else {
+        setError(data.message || '検索に失敗しました');
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  useEffect(() => {
     fetchPosts();
   }, []);
 
@@ -50,6 +68,16 @@ const PostsList = () => {
         </button>
         <button onClick={handleCreateNewPost}>新規投稿を作成</button>
       </div>
+      <form onSubmit={handleSearch} style={{ margin: '20px 0' }}>
+        <input
+          type="text"
+          placeholder="検索クエリを入力"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ marginRight: '10px' }}
+        />
+        <button type="submit">検索</button>
+      </form>
       <ul>
         {posts.map((post) => (
           <li key={post.$id}>
