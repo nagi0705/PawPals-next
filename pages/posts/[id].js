@@ -7,9 +7,22 @@ const PostDetail = () => {
   const { id } = router.query;
   const { data: session } = useSession();
   const [post, setPost] = useState(null);
+  const [comments, setComments] = useState([]); // コメントを保存
+  const [newComment, setNewComment] = useState(''); // 新しいコメント
   const [error, setError] = useState(null);
   const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [commentLoading, setCommentLoading] = useState(false);
+  const [commentError, setCommentError] = useState(null);
+
+  // メールアドレスを伏せ字に変換する関数
+  const maskEmail = (email) => {
+    const [localPart, domain] = email.split('@');
+    if (localPart.length <= 3) {
+      return `${localPart[0]}*****@${domain}`;
+    }
+    return `${localPart.slice(0, 3)}*****@${domain}`;
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -19,7 +32,6 @@ const PostDetail = () => {
         const response = await fetch(`/api/posts/${id}`);
         if (response.ok) {
           const data = await response.json();
-          console.log('取得した投稿データ:', data);
           setPost(data);
 
           if (data.likedBy?.includes(session?.user?.email)) {
@@ -33,7 +45,22 @@ const PostDetail = () => {
       }
     };
 
+    const fetchComments = async () => {
+      try {
+        const response = await fetch(`/api/comments?postId=${id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setComments(data); // コメントを保存
+        } else {
+          console.error('コメントの取得に失敗しました');
+        }
+      } catch (err) {
+        console.error('コメントの取得エラー:', err);
+      }
+    };
+
     fetchPost();
+    fetchComments(); // コメントの取得
   }, [id, session]);
 
   const toggleLike = async () => {
@@ -81,6 +108,40 @@ const PostDetail = () => {
     }
   };
 
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
+    setCommentLoading(true);
+    setCommentError(null);
+
+    try {
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postId: id,
+          content: newComment,
+          ownerEmail: session.user.email,
+        }),
+      });
+
+      if (response.ok) {
+        const newCommentData = await response.json();
+        setComments((prevComments) => [...prevComments, newCommentData.comment]);
+        setNewComment(''); // フォームをリセット
+      } else {
+        setCommentError('コメント投稿に失敗しました');
+      }
+    } catch (err) {
+      setCommentError('コメント投稿中にエラーが発生しました');
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
   if (error) {
     return <p style={{ color: 'red' }}>{error}</p>;
   }
@@ -99,12 +160,12 @@ const PostDetail = () => {
             src={post.image}
             alt={post.title}
             style={{
-              maxWidth: '500px', // 横幅を最大500pxに制限
-              maxHeight: '300px', // 縦幅を最大300pxに制限
-              width: 'auto', // アスペクト比を保つ
-              height: 'auto', // アスペクト比を保つ
-              borderRadius: '10px', // 角を少し丸くする
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // 少し影をつける
+              maxWidth: '500px',
+              maxHeight: '300px',
+              width: 'auto',
+              height: 'auto',
+              borderRadius: '10px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             }}
           />
         </div>
@@ -122,6 +183,52 @@ const PostDetail = () => {
         </div>
       )}
       <p>※画像は任意投稿なので、変更したい場合は新しく投稿し直してください😣</p>
+
+      <h2>コメント一覧</h2>
+      {comments.length > 0 ? (
+        <ul>
+          {comments.map((comment) => (
+            <li key={comment.$id}>
+              <strong>{maskEmail(comment.ownerEmail)}:</strong> {comment.content}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>コメントはまだありません</p>
+      )}
+
+      <h2>コメントを投稿</h2>
+      <form onSubmit={handleCommentSubmit}>
+        <textarea
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          rows="3"
+          placeholder="コメントを入力"
+          style={{
+            width: '100%',
+            marginBottom: '10px',
+            padding: '10px',
+            border: '1px solid #ddd',
+            borderRadius: '5px',
+          }}
+        />
+        <button
+          type="submit"
+          disabled={commentLoading}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#0070f3',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+          }}
+        >
+          {commentLoading ? '送信中...' : 'コメントを投稿'}
+        </button>
+      </form>
+      {commentError && <p style={{ color: 'red' }}>{commentError}</p>}
+
       <button
         onClick={() => router.push('/posts')}
         style={{
