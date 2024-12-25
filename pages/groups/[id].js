@@ -70,6 +70,21 @@ export default function GroupDetail() {
         >
           グループを削除
         </button>
+        <Link href={`/groups/${id}/chat`}>
+          <button
+            style={{
+              marginLeft: "10px",
+              backgroundColor: "#0070f3",
+              color: "white",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            チャットページに移動
+          </button>
+        </Link>
       </div>
 
       <h2>Members</h2>
