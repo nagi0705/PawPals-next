@@ -16,7 +16,7 @@ export default function GroupDetail() {
       try {
         const response = await fetch(`/api/groups/${id}`);
         if (!response.ok) {
-          throw new Error("Failed to fetch group");
+          throw new Error("グループ情報の取得に失敗しました");
         }
         const data = await response.json();
         setGroup(data);
@@ -35,20 +35,17 @@ export default function GroupDetail() {
     if (!confirmDelete) return;
 
     try {
-      const token = await fetch("/api/auth/session").then((res) => res.json());
       const response = await fetch(`/api/groups/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token?.user?.jwt}`, // 認証トークンを送信
-        },
       });
 
       if (!response.ok) {
-        throw new Error("メンバー以外は削除できません");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "削除に失敗しました");
       }
 
       alert("グループが削除されました");
-      router.push("/groups"); // グループ一覧ページへリダイレクト
+      router.push("/groups");
     } catch (err) {
       alert(err.message);
     }
@@ -63,13 +60,13 @@ export default function GroupDetail() {
       <h1>{group.name}</h1>
       <p>{group.description}</p>
 
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: "20px" }}>
         <Link href={`/groups/${id}/edit`}>
-          <button style={{ marginRight: '10px' }}>グループを編集</button>
+          <button style={{ marginRight: "10px" }}>グループを編集</button>
         </Link>
-        <button 
-          onClick={handleDeleteGroup} 
-          style={{ backgroundColor: '#ff4444', color: 'white' }}
+        <button
+          onClick={handleDeleteGroup}
+          style={{ backgroundColor: "#ff4444", color: "white" }}
         >
           グループを削除
         </button>
@@ -79,8 +76,8 @@ export default function GroupDetail() {
       <ul>
         {group.members && group.members.length > 0 ? (
           group.members.map((member) => (
-            <li key={member.$id}>
-              {member.name || member.userEmail}
+            <li key={member.email}>
+              {member.name || member.email}
             </li>
           ))
         ) : (
@@ -88,7 +85,7 @@ export default function GroupDetail() {
         )}
       </ul>
 
-      <div style={{ marginTop: '20px' }}>
+      <div style={{ marginTop: "20px" }}>
         <Link href="/groups">
           <button>グループ一覧に戻る</button>
         </Link>
