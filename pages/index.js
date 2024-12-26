@@ -29,6 +29,14 @@ export default function Home() {
             ログイン
           </Link>
         </div>
+        <div className="mt-4">
+          <Link
+            href="/about"
+            className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+          >
+            アプリについて
+          </Link>
+        </div>
       </div>
     </div>
   );
