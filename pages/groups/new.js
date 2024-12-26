@@ -138,7 +138,7 @@ const NewGroup = () => {
             ))}
           </select>
           <small style={{ color: "#666", marginTop: "5px", display: "block" }}>
-            Ctrlキーを押しながらクリックで複数選択できます
+            コマンドキーを押しながらクリックで複数選択できます
           </small>
         </div>
 
