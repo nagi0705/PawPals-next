@@ -1,7 +1,25 @@
 import { Client, Databases } from 'appwrite';
 
 export default async function handler(req, res) {
-  // Appwriteクライアントの初期化
+  // CORS 設定を追加
+  const allowedOrigins = [
+    "https://paw-pals-next-a7jjepgz3-nagis-projects-862cf868.vercel.app",
+    "http://localhost:3000",
+  ];
+
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  // OPTIONS リクエストへの対応
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // Appwrite クライアントの初期化
   const client = new Client()
     .setEndpoint('https://cloud.appwrite.io/v1') // Appwrite APIエンドポイント
     .setProject('675183a100255c6c9a3f'); // プロジェクトID
