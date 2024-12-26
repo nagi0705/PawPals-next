@@ -88,6 +88,28 @@ const PostDetail = () => {
     }
   };
 
+  const handleDeletePost = async () => {
+    if (!confirm('この投稿を削除してもよろしいですか？')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/posts/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        alert('投稿が削除されました');
+        router.push('/posts'); // 投稿一覧に戻る
+      } else {
+        alert('投稿の削除に失敗しました');
+      }
+    } catch (err) {
+      console.error('投稿削除エラー:', err);
+      alert('投稿の削除中にエラーが発生しました');
+    }
+  };
+
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -223,7 +245,7 @@ const PostDetail = () => {
       {post.ownerEmail === session?.user?.email && (
         <div>
           <button onClick={() => router.push(`/posts/${id}/edit`)}>編集</button>
-          <button onClick={() => router.push(`/posts`)}>削除</button>
+          <button onClick={handleDeletePost}>削除</button>
         </div>
       )}
       <h2>コメント一覧</h2>
