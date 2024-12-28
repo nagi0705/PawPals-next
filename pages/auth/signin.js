@@ -1,4 +1,3 @@
-// pages/auth/signin.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signIn } from 'next-auth/react';  // signInを追加
@@ -38,8 +37,18 @@ const Signin = () => {
   };
 
   return (
-    <div>
-      <h1>サインイン</h1>
+    <div
+      style={{
+        backgroundColor: "#e2ffe2",
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        margin: "2rem auto",
+        maxWidth: "400px",
+        textAlign: "center",
+      }}
+    >
+      <h1 style={{ color: "#f68fe1" }}>ログイン</h1>
       <form onSubmit={handleSignin}>
         <input
           type="email"
@@ -47,6 +56,13 @@ const Signin = () => {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="メールアドレス"
           required
+          style={{
+            padding: "10px",
+            borderRadius: "5px",
+            border: "2px solid black",
+            marginBottom: "10px",
+            width: "100%",
+          }}
         />
         <input
           type="password"
@@ -54,8 +70,29 @@ const Signin = () => {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="パスワード"
           required
+          style={{
+            padding: "10px",
+            borderRadius: "5px",
+            border: "2px solid black",
+            marginBottom: "10px",
+            width: "100%",
+          }}
         />
-        <button type="submit">サインイン</button>
+        <button
+          type="submit"
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#f68fe1",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
+        >
+          ログイン
+        </button>
       </form>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}

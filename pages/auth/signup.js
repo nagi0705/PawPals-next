@@ -1,4 +1,3 @@
-// pages/auth/signup.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSession, signIn } from 'next-auth/react';
@@ -53,7 +52,18 @@ const Signup = () => {
   };
 
   return (
-    <div>
+    <div
+      style={{
+        backgroundColor: "#e2ffe2",
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        margin: "2rem auto",
+        maxWidth: "400px",
+        textAlign: "center",
+      }}
+    >
+      <h1 style={{ color: "#f68fe1" }}>サインアップ</h1>
       <form onSubmit={handleSignup}>
         <input
           type="text"
@@ -61,6 +71,13 @@ const Signup = () => {
           onChange={(e) => setName(e.target.value)}
           placeholder="名前"
           required
+          style={{
+            padding: "10px",
+            borderRadius: "5px",
+            border: "2px solid black",
+            marginBottom: "10px",
+            width: "100%",
+          }}
         />
         <input
           type="email"
@@ -68,6 +85,13 @@ const Signup = () => {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="メールアドレス"
           required
+          style={{
+            padding: "10px",
+            borderRadius: "5px",
+            border: "2px solid black",
+            marginBottom: "10px",
+            width: "100%",
+          }}
         />
         <input
           type="password"
@@ -75,8 +99,29 @@ const Signup = () => {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="パスワード"
           required
+          style={{
+            padding: "10px",
+            borderRadius: "5px",
+            border: "2px solid black",
+            marginBottom: "10px",
+            width: "100%",
+          }}
         />
-        <button type="submit">サインアップ</button>
+        <button
+          type="submit"
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#f68fe1",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
+        >
+          サインアップ
+        </button>
       </form>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
