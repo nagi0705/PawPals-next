@@ -49,7 +49,7 @@ const AddPet = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       <h1>新しいペットを追加</h1>
       <form onSubmit={handleSubmit}>
         <div>

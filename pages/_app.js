@@ -1,12 +1,12 @@
-import { SessionProvider } from 'next-auth/react';  // next-authからSessionProviderをインポート
-//import '../styles/globals.css';  // 必要に応じてスタイルをインポート
+// pages/_app.js
+import 'bootstrap/dist/css/bootstrap.min.css'; // BootstrapのCSSをインポート
+import '../styles/globals.css'; // 他のスタイルもインポート
+import { SessionProvider } from "next-auth/react"; // SessionProviderをインポート
 
-function MyApp({ Component, pageProps }) {
+export default function App({ Component, pageProps }) {
   return (
-    <SessionProvider session={pageProps.session}>  {/* SessionProviderでラップ */}
+    <SessionProvider session={pageProps.session}>
       <Component {...pageProps} />
     </SessionProvider>
   );
 }
-
-export default MyApp;

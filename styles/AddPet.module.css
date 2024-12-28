@@ -1,0 +1,17 @@
+.container {
+  color: #1a202c; /* foreground */
+  background: #f9fafb; /* background */
+  font-family: "Comic Sans MS", sans-serif;
+}
+
+.button {
+  background-color: #ff6f61; /* primary-color */
+  color: #f9fafb; /* background */
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #f56565; /* accent-color */
+} 
