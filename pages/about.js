@@ -21,7 +21,7 @@ export default function About() {
           marginBottom: "1rem",
         }}
       >
-        <h1 style={{ color: "#ff69b4", textAlign: "center" }}>PawPalsについて</h1>
+        <h1 style={{ color: "#f68fe1", textAlign: "center" }}>PawPalsについて</h1>
         <p style={{ textAlign: "center", color: "#2d3748" }}>
           PawPalsは、ペット愛好家のためのソーシャルプラットフォームです。<br />
           ユーザーはペットを登録し、ペットに関する投稿を共有し、<br />
@@ -39,7 +39,7 @@ export default function About() {
           marginBottom: "1rem",
         }}
       >
-        <h2 style={{ color: "#ff69b4", textAlign: "center" }}>主な特徴</h2>
+        <h2 style={{ color: "#f68fe1", textAlign: "center" }}>主な特徴</h2>
         <ul style={{ textAlign: "center", color: "#2d3748" }}>
           <li>ペットのプロフィールを作成・管理</li>
           <li>他のユーザーの投稿を見る・いいねする・コメントする</li>
@@ -57,7 +57,7 @@ export default function About() {
           marginBottom: "1rem",
         }}
       >
-        <h2 style={{ color: "#ff69b4", textAlign: "center" }}>開発の背景</h2>
+        <h2 style={{ color: "#f68fe1", textAlign: "center" }}>開発の背景</h2>
         <p style={{ textAlign: "center", color: "#2d3748" }}>
           PawPalsは、ペット愛好家が楽しく交流できる場を提供するために開発されました。<br />
           ユーザーは自身のペットの日常を共有し、他のユーザーのペットについて知ることができます。
@@ -67,22 +67,21 @@ export default function About() {
       {/* トップページに戻るボタン */}
       <div style={{ textAlign: "center", marginTop: "2rem" }}>
         <Link href="/" passHref>
-          <span
+          <button
             style={{
-              display: "inline-block",
-              backgroundColor: "#ff69b4",
-              color: "#ffffff",
-              padding: "0.75rem 1.5rem",
-              borderRadius: "12px",
-              textDecoration: "none",
-              fontSize: "1rem",
-              fontWeight: "bold",
-              transition: "background-color 0.3s ease",
+              backgroundColor: "#f68fe1",
+              color: "white",
+              padding: "10px 20px",
+              border: "none",
+              borderRadius: "5px",
               cursor: "pointer",
+              fontWeight: "bold",
             }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
           >
             トップページに戻る
-          </span>
+          </button>
         </Link>
       </div>
     </div>
