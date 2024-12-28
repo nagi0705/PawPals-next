@@ -31,13 +31,13 @@ const Top = ({ session }) => {
           </Link>
         </div>
         <div>
-          <Link href="/pets/new" className="link-button">
-            🐾 ペットを登録しよう！
+          <Link href="/pets" className="link-button">
+            🐾 ペットを登録&他のペットも見てみよう！
           </Link>
         </div>
         <div>
-          <Link href="/pets" className="link-button">
-            📸 ペット自慢&他のペットも見てみよう！
+          <Link href="/posts" className="link-button">
+            📸 ペット自慢&閲覧してみよう！
           </Link>
         </div>
         <div>

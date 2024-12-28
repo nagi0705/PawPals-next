@@ -50,7 +50,7 @@ const AddPet = () => {
 
   return (
     <div className="container">
-      <h1>新しいペットを追加</h1>
+      <h1>🐾 新しいペットを追加 🐾</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label>名前</label>
@@ -59,6 +59,13 @@ const AddPet = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            style={{
+              border: '1px solid black', // 黒い縁
+              borderRadius: '8px', // 角を丸く
+              padding: '8px',
+              marginBottom: '10px',
+              width: '100%',
+            }}
           />
         </div>
         <div>
@@ -68,6 +75,13 @@ const AddPet = () => {
             value={age}
             onChange={(e) => setAge(e.target.value)}
             required
+            style={{
+              border: '1px solid black', // 黒い縁
+              borderRadius: '8px', // 角を丸く
+              padding: '8px',
+              marginBottom: '10px',
+              width: '100%',
+            }}
           />
         </div>
         <div>
@@ -77,6 +91,13 @@ const AddPet = () => {
             value={species}
             onChange={(e) => setSpecies(e.target.value)}
             required
+            style={{
+              border: '1px solid black', // 黒い縁
+              borderRadius: '8px', // 角を丸く
+              padding: '8px',
+              marginBottom: '10px',
+              width: '100%',
+            }}
           />
         </div>
         <div>
@@ -86,14 +107,44 @@ const AddPet = () => {
             value={breed}
             onChange={(e) => setBreed(e.target.value)}
             required
+            style={{
+              border: '1px solid black', // 黒い縁
+              borderRadius: '8px', // 角を丸く
+              padding: '8px',
+              marginBottom: '10px',
+              width: '100%',
+            }}
           />
         </div>
-        <button type="submit" disabled={loading}>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            backgroundColor: '#ff69b4',
+            color: 'white',
+            padding: '10px 20px',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            marginTop: '10px',
+          }}
+        >
           {loading ? '登録中...' : 'ペットを追加'}
         </button>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </form>
-      <button onClick={handleGoBack} style={{ marginTop: '20px' }}>
+      <button
+        onClick={handleGoBack}
+        style={{
+          backgroundColor: '#6c757d',
+          color: 'white',
+          padding: '10px 20px',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          marginTop: '20px',
+        }}
+      >
         ペット一覧に戻る
       </button>
     </div>

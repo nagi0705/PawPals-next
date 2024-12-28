@@ -60,33 +60,105 @@ const PostsList = () => {
   };
 
   return (
-    <div>
-      <h1>投稿一覧</h1>
-      <div>
-        <button onClick={handleGoHome} style={{ marginRight: '10px' }}>
+    <div
+      style={{
+        backgroundColor: "#e2ffe2", // グリーンの背景色
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        margin: "2rem auto",
+        maxWidth: "800px",
+      }}
+    >
+      <h1 style={{ color: "#f68fe1", textAlign: "center" }}>投稿一覧</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+        <button
+          onClick={handleGoHome}
+          style={{
+            backgroundColor: "#f68fe1",
+            borderRadius: "8px",
+            padding: "0.5rem 1rem",
+            border: "none",
+            cursor: "pointer",
+            color: "#fff",
+          }}
+        >
           トップページに戻る
         </button>
-        <button onClick={handleCreateNewPost}>新規投稿を作成</button>
+        <button
+          onClick={handleCreateNewPost}
+          style={{
+            backgroundColor: "#f68fe1",
+            borderRadius: "8px",
+            padding: "0.5rem 1rem",
+            border: "none",
+            cursor: "pointer",
+            color: "#fff",
+          }}
+        >
+          新規投稿を作成
+        </button>
       </div>
-      <form onSubmit={handleSearch} style={{ margin: '20px 0' }}>
+      <form onSubmit={handleSearch} style={{ margin: "20px 0", textAlign: "center" }}>
         <input
           type="text"
           placeholder="検索クエリを入力"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ marginRight: '10px' }}
+          style={{
+            padding: "8px",
+            width: "70%",
+            border: "2px solid black", // 黒い縁を追加
+            borderRadius: "8px",
+            marginRight: "10px",
+          }}
         />
-        <button type="submit">検索</button>
+        <button
+          type="submit"
+          style={{
+            backgroundColor: "#f68fe1",
+            borderRadius: "8px",
+            padding: "0.5rem 1rem",
+            border: "none",
+            cursor: "pointer",
+            color: "#fff",
+          }}
+        >
+          検索
+        </button>
       </form>
-      <ul>
+      <div>
         {posts.map((post) => (
-          <li key={post.$id}>
-            <h2>{post.title}</h2>
-            <p>{post.content}</p>
-            <a href={`/posts/${post.$id}`}>詳細を見る</a>
-          </li>
+          <div
+            key={post.$id}
+            style={{
+              backgroundColor: "#ffffff", // 個々の投稿を白で囲む
+              borderRadius: "12px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              padding: "1rem",
+              marginBottom: "1rem",
+            }}
+          >
+            <h2 style={{ color: "#f68fe1", textAlign: "center" }}>{post.title}</h2>
+            <p style={{ textAlign: "center" }}>{post.content}</p>
+            <div style={{ textAlign: "center" }}>
+              <button
+                onClick={() => router.push(`/posts/${post.$id}`)}
+                style={{
+                  backgroundColor: "#f68fe1",
+                  borderRadius: "8px",
+                  padding: "0.5rem 1rem",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#fff",
+                }}
+              >
+                詳細を見る
+              </button>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

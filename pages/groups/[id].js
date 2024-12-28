@@ -56,42 +56,87 @@ export default function GroupDetail() {
   if (!group) return <p>グループが見つかりません</p>;
 
   return (
-    <div>
-      <h1>{group.name}</h1>
+    <div
+      style={{
+        backgroundColor: "#e2ffe2",
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        margin: "2rem auto",
+        maxWidth: "800px",
+        textAlign: "center",
+      }}
+    >
+      <h1 style={{ color: "#f68fe1" }}>{group.name}</h1>
       <p>{group.description}</p>
-
+      <br />
       <div style={{ marginBottom: "20px" }}>
         <Link href={`/groups/${id}/edit`}>
-          <button style={{ marginRight: "10px" }}>グループを編集</button>
-        </Link>
-        <button
-          onClick={handleDeleteGroup}
-          style={{ backgroundColor: "#ff4444", color: "white" }}
-        >
-          グループを削除
-        </button>
-        <Link href={`/groups/${id}/chat`}>
           <button
             style={{
-              marginLeft: "10px",
-              backgroundColor: "#0070f3",
+              marginRight: "10px",
+              backgroundColor: "#f68fe1",
               color: "white",
               border: "none",
               padding: "10px 20px",
               borderRadius: "5px",
               cursor: "pointer",
             }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
+          >
+            グループを編集
+          </button>
+        </Link>
+        <button
+          onClick={handleDeleteGroup}
+          style={{
+            backgroundColor: "#f68fe1",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            cursor: "pointer",
+            marginRight: "10px",
+          }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
+        >
+          グループを削除
+        </button>
+        <Link href={`/groups/${id}/chat`}>
+          <button
+            style={{
+              backgroundColor: "#f68fe1",
+              color: "white",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
           >
             チャットページに移動
           </button>
         </Link>
       </div>
 
-      <h2>Members</h2>
-      <ul>
+      <h2 style={{ color: "#f68fe1" }}>Members</h2>
+      <ul style={{ listStyle: "none", padding: 0 }}>
         {group.members && group.members.length > 0 ? (
           group.members.map((member) => (
-            <li key={member.email}>
+            <li
+              key={member.email}
+              style={{
+                backgroundColor: "white",
+                borderRadius: "12px",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                padding: "1rem",
+                marginBottom: "1rem",
+                textAlign: "center",
+              }}
+            >
               {member.name || member.email}
             </li>
           ))
@@ -102,7 +147,20 @@ export default function GroupDetail() {
 
       <div style={{ marginTop: "20px" }}>
         <Link href="/groups">
-          <button>グループ一覧に戻る</button>
+          <button
+            style={{
+              backgroundColor: "#f68fe1",
+              color: "white",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
+          >
+            グループ一覧に戻る
+          </button>
         </Link>
       </div>
     </div>

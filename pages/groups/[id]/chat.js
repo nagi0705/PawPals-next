@@ -66,7 +66,7 @@ export default function ChatPage() {
   };
 
   const handleEditMessage = async (messageId, updatedContent) => {
-    if (!updatedContent.trim()) {
+    if (!updatedContent || !updatedContent.trim()) { // 修正部分
       alert("編集内容を入力してください。");
       return;
     }
@@ -126,6 +126,7 @@ export default function ChatPage() {
           height: "400px",
           overflowY: "scroll",
           marginBottom: "20px",
+          backgroundColor: "#f9f9f9",
         }}
       >
         {messages.length > 0 ? (
@@ -137,6 +138,7 @@ export default function ChatPage() {
                 padding: "10px",
                 backgroundColor: "#f9f9f9",
                 borderRadius: "5px",
+                backgroundColor: "#b4f2a397",
               }}
             >
               <p>
@@ -153,7 +155,7 @@ export default function ChatPage() {
                     編集
                   </button>
                   <button
-                    style={{ color: "red" }}
+                    style={{ color: "white" }}
                     onClick={() => handleDeleteMessage(message.$id)}
                   >
                     削除
@@ -183,7 +185,6 @@ export default function ChatPage() {
           onClick={handleSendMessage}
           style={{
             padding: "10px 20px",
-            backgroundColor: "#0070f3",
             color: "white",
             border: "none",
             borderRadius: "5px",
@@ -198,7 +199,6 @@ export default function ChatPage() {
           <button
             style={{
               padding: "10px 20px",
-              backgroundColor: "#ddd",
               border: "none",
               borderRadius: "5px",
               cursor: "pointer",

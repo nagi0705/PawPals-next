@@ -61,22 +61,23 @@ const NewGroup = () => {
     }
   };
 
-  const maskEmail = (email) => {
-    const [username, domain] = email.split("@");
-    const maskedUsername =
-      username.charAt(0) + "*".repeat(username.length - 2) + username.charAt(username.length - 1);
-    const [domainName, extension] = domain.split(".");
-    const maskedDomain = domainName.charAt(0) + "*".repeat(domainName.length - 1);
-    return `${maskedUsername}@${maskedDomain}.${extension}`;
-  };
-
   if (!session) {
     return <div>ログインが必要です</div>;
   }
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
-      <h1>新しいグループを作成</h1>
+    <div
+      style={{
+        backgroundColor: "#e2ffe2",
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        margin: "2rem auto",
+        maxWidth: "800px",
+        textAlign: "center",
+      }}
+    >
+      <h1 style={{ color: "#f68fe1" }}>新しいグループを作成</h1>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "20px" }}>
           <label htmlFor="name" style={{ display: "block", marginBottom: "5px" }}>
@@ -90,9 +91,9 @@ const NewGroup = () => {
             required
             style={{
               width: "100%",
-              padding: "8px",
-              borderRadius: "4px",
-              border: "1px solid #ddd",
+              padding: "10px",
+              borderRadius: "5px",
+              border: "2px solid black",
             }}
           />
         </div>
@@ -108,35 +109,38 @@ const NewGroup = () => {
             rows="4"
             style={{
               width: "100%",
-              padding: "8px",
-              borderRadius: "4px",
-              border: "1px solid #ddd",
+              padding: "10px",
+              borderRadius: "5px",
+              border: "2px solid black",
             }}
           />
         </div>
 
-        <div style={{ marginBottom: "20px" }}>
-          <label style={{ display: "block", marginBottom: "5px" }}>
+        <div style={{ marginBottom: "20px", textAlign: "center" }}>
+          <label style={{ display: "block", marginBottom: "10px" }}>
             メンバー（複数選択可。自分は含めないで選択してください。）
           </label>
-          <select
-            multiple
-            value={members}
-            onChange={(e) => setMembers(Array.from(e.target.selectedOptions, (option) => option.value))}
-            style={{
-              width: "100%",
-              padding: "8px",
-              borderRadius: "4px",
-              border: "1px solid #ddd",
-              minHeight: "150px",
-            }}
-          >
-            {users.map((user) => (
-              <option key={user.$id} value={user.email}>
-                {user.name} ({maskEmail(user.email)})
-              </option>
-            ))}
-          </select>
+          <div style={{ display: "inline-block" }}>
+            <select
+              multiple
+              value={members}
+              onChange={(e) => setMembers(Array.from(e.target.selectedOptions, (option) => option.value))}
+              style={{
+                width: "300px",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "2px solid black",
+                minHeight: "150px",
+                textAlign: "left",
+              }}
+            >
+              {users.map((user) => (
+                <option key={user.$id} value={user.email}>
+                  {user.name}
+                </option>
+              ))}
+            </select>
+          </div>
           <small style={{ color: "#666", marginTop: "5px", display: "block" }}>
             コマンドキーを押しながらクリックで複数選択できます
           </small>
@@ -144,18 +148,20 @@ const NewGroup = () => {
 
         {error && <p style={{ color: "red", marginBottom: "20px" }}>{error}</p>}
 
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
           <button
             type="submit"
             disabled={loading}
             style={{
               padding: "10px 20px",
-              backgroundColor: "#0070f3",
+              backgroundColor: "#f68fe1",
               color: "white",
               border: "none",
               borderRadius: "5px",
               cursor: loading ? "not-allowed" : "pointer",
             }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
           >
             {loading ? "作成中..." : "作成"}
           </button>
@@ -164,12 +170,14 @@ const NewGroup = () => {
             onClick={() => router.push("/groups")}
             style={{
               padding: "10px 20px",
-              backgroundColor: "#666",
+              backgroundColor: "#f68fe1",
               color: "white",
               border: "none",
               borderRadius: "5px",
               cursor: "pointer",
             }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
           >
             キャンセル
           </button>

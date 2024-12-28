@@ -47,22 +47,84 @@ const PetDetail = ({ pet, isOwner }) => {
   }
 
   return (
-    <div>
-      <h1>{pet.name}の詳細</h1>
-      <p>種別: {pet.species}</p>
-      <p>年齢: {pet.age}</p>
-      <p>種類: {pet.breed}</p>
+    <div
+      style={{
+        backgroundColor: "#e2ffe2", // グリーンの背景色
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        margin: "2rem auto",
+        maxWidth: "800px",
+        textAlign: "center", // 中央揃え
+      }}
+    >
+      <h1 style={{ color: "#f68fe1", marginBottom: "1rem" }}>{pet.name}の詳細</h1>
+      <p style={{ fontWeight: "bold" }}>種別: {pet.species}</p>
+      <p style={{ fontWeight: "bold" }}>年齢: {pet.age}</p>
+      <p style={{ fontWeight: "bold" }}>種類: {pet.breed}</p>
 
       {isOwner && (
-        <div>
-          <button onClick={handleEdit}>編集</button> {/* 編集ボタン */}
-          <button onClick={handleDelete}>削除</button>
+        <div style={{ margin: "1rem 0" }}>
+          <button
+            onClick={handleEdit}
+            style={{
+              backgroundColor: "#f68fe1",
+              borderRadius: "8px",
+              padding: "0.5rem 1rem",
+              border: "none",
+              cursor: "pointer",
+              marginRight: "1rem",
+              color: "#fff",
+            }}
+          >
+            編集
+          </button>
+          <button
+            onClick={handleDelete}
+            style={{
+              backgroundColor: "#f68fe1",
+              borderRadius: "8px",
+              padding: "0.5rem 1rem",
+              border: "none",
+              cursor: "pointer",
+              color: "#fff",
+            }}
+          >
+            削除
+          </button>
         </div>
       )}
 
-      <button onClick={handleBack} style={{ marginTop: '20px' }}>
+      <button
+        onClick={handleBack}
+        style={{
+          backgroundColor: "#f68fe1",
+          borderRadius: "8px",
+          padding: "0.5rem 1rem",
+          border: "none",
+          cursor: "pointer",
+          color: "#fff",
+          marginTop: "1rem",
+        }}
+      >
         ペット一覧に戻る
       </button>
+
+      {/* 画像の追加 */}
+      <div style={{ marginTop: "1.5rem" }}>
+        <img
+          src="/images/pawpals2.jpg" // 画像のパス
+          alt="PawPalsのイメージ"
+          style={{
+            width: "100%",
+            maxWidth: "400px",
+            height: "auto",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            margin: "0 auto",
+          }}
+        />
+      </div>
     </div>
   );
 };

@@ -27,14 +27,12 @@ const EditPet = ({ pet, isOwner }) => {
     const petData = { name, age, species, breed };
 
     try {
-      // Appwrite クライアントの初期化
       const client = new Client()
         .setEndpoint('https://cloud.appwrite.io/v1') // Appwrite エンドポイント
         .setProject('675183a100255c6c9a3f'); // プロジェクトID
 
       const databases = new Databases(client);
 
-      // ペット情報の更新
       const response = await databases.updateDocument(
         '6751bd2800009a139bb8', // データベースID
         '67679a6600013eb8b9ed', // コレクションID
@@ -61,53 +59,116 @@ const EditPet = ({ pet, isOwner }) => {
   }
 
   return (
-    <div>
-      <h1>{pet.name}の情報を編集</h1>
+    <div
+      style={{
+        backgroundColor: "#e2ffe2", // 緑の背景
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        margin: "2rem auto",
+        maxWidth: "600px",
+      }}
+    >
+      <h1 style={{ color: "#f68fe1", textAlign: "center" }}>{pet.name}の情報を編集</h1>
       <form onSubmit={handleSubmit}>
-        <div>
+        <div style={{ marginBottom: "1rem" }}>
           <label>名前</label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "8px",
+              border: "2px solid black",
+              borderRadius: "8px",
+              marginTop: "5px",
+            }}
           />
         </div>
-        <div>
+        <div style={{ marginBottom: "1rem" }}>
           <label>年齢</label>
           <input
             type="number"
             value={age}
             onChange={(e) => setAge(e.target.value)}
             required
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "8px",
+              border: "2px solid black",
+              borderRadius: "8px",
+              marginTop: "5px",
+            }}
           />
         </div>
-        <div>
+        <div style={{ marginBottom: "1rem" }}>
           <label>動物(犬、猫、鳥など)</label>
           <input
             type="text"
             value={species}
             onChange={(e) => setSpecies(e.target.value)}
             required
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "8px",
+              border: "2px solid black",
+              borderRadius: "8px",
+              marginTop: "5px",
+            }}
           />
         </div>
-        <div>
+        <div style={{ marginBottom: "1rem" }}>
           <label>種類(チワワ、ロシアンブルーなど)</label>
           <input
             type="text"
             value={breed}
             onChange={(e) => setBreed(e.target.value)}
             required
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "8px",
+              border: "2px solid black",
+              borderRadius: "8px",
+              marginTop: "5px",
+            }}
           />
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? '更新中...' : 'ペット情報を更新'}
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            backgroundColor: "#f68fe1",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            padding: "0.5rem 1rem",
+            cursor: "pointer",
+            marginRight: "1rem",
+          }}
+        >
+          {loading ? "更新中..." : "ペット情報を更新"}
         </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
 
-      {/* 戻るボタン */}
-      <button onClick={handleBack} style={{ marginTop: '20px' }}>
+      <button
+        onClick={handleBack}
+        style={{
+          backgroundColor: "#f68fe1",
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          padding: "0.5rem 1rem",
+          cursor: "pointer",
+          marginTop: "1rem",
+        }}
+      >
         ペット詳細に戻る
       </button>
     </div>
@@ -118,33 +179,31 @@ const EditPet = ({ pet, isOwner }) => {
 export async function getServerSideProps(context) {
   const { id } = context.params;
 
-  // セッション情報の取得
   const session = await getServerSession(context.req, context.res, authOptions);
 
   if (!session) {
     return {
       redirect: {
-        destination: '/auth/signin',
+        destination: "/auth/signin",
         permanent: false,
       },
     };
   }
 
   const client = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject('675183a100255c6c9a3f');
+    .setEndpoint("https://cloud.appwrite.io/v1")
+    .setProject("675183a100255c6c9a3f");
   const databases = new Databases(client);
 
   try {
-    // ペットデータの取得
     const response = await databases.getDocument(
-      '6751bd2800009a139bb8', // データベースID
-      '67679a6600013eb8b9ed', // コレクションID
-      id // ペットID
+      "6751bd2800009a139bb8",
+      "67679a6600013eb8b9ed",
+      id
     );
 
     const pet = response;
-    const isOwner = pet.ownerEmail === session.user.email; // オーナーかどうかの判定
+    const isOwner = pet.ownerEmail === session.user.email;
 
     return {
       props: { pet, isOwner },
@@ -152,7 +211,7 @@ export async function getServerSideProps(context) {
   } catch (error) {
     console.error(error);
     return {
-      notFound: true, // ペットが見つからない場合は404
+      notFound: true,
     };
   }
 }

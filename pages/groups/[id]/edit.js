@@ -7,10 +7,10 @@ export default function EditGroup() {
   const { id } = router.query;
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] =useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    description: ''
+    name: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -20,13 +20,13 @@ export default function EditGroup() {
       try {
         const response = await fetch(`/api/groups/${id}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch group');
+          throw new Error("Failed to fetch group");
         }
         const data = await response.json();
         setGroup(data);
         setFormData({
           name: data.name,
-          description: data.description
+          description: data.description,
         });
       } catch (err) {
         setError(err.message);
@@ -42,15 +42,15 @@ export default function EditGroup() {
     e.preventDefault();
     try {
       const response = await fetch(`/api/groups/${id}/edit`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error('メンバー以外は編集できません');
+        throw new Error("メンバー以外は編集できません");
       }
 
       router.push(`/groups/${id}`);
@@ -62,7 +62,7 @@ export default function EditGroup() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -71,11 +71,23 @@ export default function EditGroup() {
   if (!group) return <p>グループが見つかりません</p>;
 
   return (
-    <div>
-      <h1>グループを編集</h1>
+    <div
+      style={{
+        backgroundColor: "#e2ffe2",
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        margin: "2rem auto",
+        maxWidth: "600px",
+        textAlign: "center",
+      }}
+    >
+      <h1 style={{ color: "#f68fe1" }}>グループを編集</h1>
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '1rem' }}>
-          <label htmlFor="name">グループ名:</label>
+        <div style={{ marginBottom: "1rem" }}>
+          <label htmlFor="name" style={{ display: "block", marginBottom: "0.5rem" }}>
+            グループ名:
+          </label>
           <input
             type="text"
             id="name"
@@ -83,24 +95,67 @@ export default function EditGroup() {
             value={formData.name}
             onChange={handleChange}
             required
+            style={{
+              width: "100%",
+              padding: "10px",
+              borderRadius: "5px",
+              border: "2px solid black",
+            }}
           />
         </div>
 
-        <div style={{ marginBottom: '1rem' }}>
-          <label htmlFor="description">説明:</label>
+        <div style={{ marginBottom: "1rem" }}>
+          <label htmlFor="description" style={{ display: "block", marginBottom: "0.5rem" }}>
+            説明:
+          </label>
           <textarea
             id="description"
             name="description"
             value={formData.description}
             onChange={handleChange}
             rows="4"
+            style={{
+              width: "100%",
+              padding: "10px",
+              borderRadius: "5px",
+              border: "2px solid black",
+            }}
           />
         </div>
 
         <div>
-          <button type="submit">更新</button>
+          <button
+            type="submit"
+            style={{
+              backgroundColor: "#f68fe1",
+              color: "white",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
+          >
+            更新
+          </button>
           <Link href={`/groups/${id}`}>
-            <button type="button" style={{ marginLeft: '10px' }}>キャンセル</button>
+            <button
+              type="button"
+              style={{
+                marginLeft: "10px",
+                backgroundColor: "#f68fe1",
+                color: "white",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+              onMouseOver={(e) => (e.target.style.backgroundColor = "#007bff")}
+              onMouseOut={(e) => (e.target.style.backgroundColor = "#f68fe1")}
+            >
+              キャンセル
+            </button>
           </Link>
         </div>
       </form>

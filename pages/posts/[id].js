@@ -199,13 +199,14 @@ const PostDetail = () => {
   }
 
   return (
-    <div>
+    <div className="text-center">
+      <br />
       <button
         onClick={() => router.push('/posts')}
         style={{
+          marginLeft: '27rem',
           marginBottom: '20px',
           padding: '8px 16px',
-          backgroundColor: '#666',
           color: '#fff',
           border: 'none',
           borderRadius: '5px',
@@ -221,11 +222,12 @@ const PostDetail = () => {
       <h1>{post.title}</h1>
       <p>{post.content}</p>
       {post.image ? (
-        <div style={{ textAlign: 'center', margin: '20px 0' }}>
+        <div style={{ textAlign: 'center', margin: '20px 0'}}>
           <img
             src={post.image}
             alt={post.title}
             style={{
+              marginLeft: '27rem',
               maxWidth: '500px',
               maxHeight: '300px',
               width: 'auto',
@@ -236,7 +238,7 @@ const PostDetail = () => {
           />
         </div>
       ) : (
-        <p>画像はありません</p>
+        <p className="text-center">画像はありません</p>
       )}
       <p>いいね: {post.likes || 0}</p>
       <button onClick={toggleLike} disabled={loading}>
@@ -248,6 +250,7 @@ const PostDetail = () => {
           <button onClick={handleDeletePost}>削除</button>
         </div>
       )}
+      <br />
       <h2>コメント一覧</h2>
       {comments.length > 0 ? (
         <ul>
@@ -306,7 +309,7 @@ const PostDetail = () => {
       ) : (
         <p>コメントはまだありません</p>
       )}
-
+      <br />
       <h2>コメントを投稿</h2>
       <form onSubmit={handleCommentSubmit}>
         <textarea
@@ -326,13 +329,16 @@ const PostDetail = () => {
           type="submit"
           disabled={commentLoading}
           style={{
-            padding: '10px 20px',
-            backgroundColor: '#0070f3',
+            padding: '0.5rem 1rem',
+            backgroundColor: '#f68fe1',
             color: '#fff',
             border: 'none',
-            borderRadius: '5px',
+            borderRadius: '8px',
             cursor: 'pointer',
+            transition: 'background-color 0.3s ease',
           }}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = '#0070f3')}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = '#f68fe1')}
         >
           {commentLoading ? '送信中...' : 'コメントを投稿'}
         </button>

@@ -32,22 +32,72 @@ export default function Groups() {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div>
-      <div style={{ marginBottom: '20px' }}>
+    <div
+      style={{
+        backgroundColor: "#e2ffe2", // グリーンの背景
+        borderRadius: "12px",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        padding: "2rem",
+        margin: "2rem auto",
+        maxWidth: "800px",
+      }}
+    >
+      <div style={{ marginBottom: "20px", textAlign: "center" }}>
         <Link href="/top">
-          <button style={{ marginRight: '10px' }}>トップページに戻る</button>
+          <button
+            style={{
+              backgroundColor: "#f68fe1",
+              borderRadius: "8px",
+              padding: "0.5rem 1rem",
+              border: "none",
+              cursor: "pointer",
+              color: "#fff",
+              marginBottom: "1rem",
+            }}
+          >
+            トップページに戻る
+          </button>
         </Link>
       </div>
 
-      <h1>グループ一覧</h1>
-      <Link href="/groups/new">
-        <button>グループを作成する</button>
-      </Link>
-
-      <ul>
-        {groups.map(group => (
-          <li key={group.$id}>
-            <Link href={`/groups/${group.$id}`}>
+      <h1 style={{ color: "#f68fe1", textAlign: "center" }}>グループ一覧</h1>
+      <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+        <Link href="/groups/new">
+          <button
+            style={{
+              backgroundColor: "#f68fe1",
+              borderRadius: "8px",
+              padding: "0.5rem 1rem",
+              border: "none",
+              cursor: "pointer",
+              color: "#fff",
+            }}
+          >
+            グループを作成する
+          </button>
+        </Link>
+      </div>
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {groups.map((group) => (
+          <li
+            key={group.$id}
+            style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              padding: "1rem",
+              marginBottom: "1rem",
+              textAlign: "center",
+            }}
+          >
+            <Link
+              href={`/groups/${group.$id}`}
+              style={{
+                color: "#f68fe1",
+                fontWeight: "bold",
+                textDecoration: "none",
+              }}
+            >
               {group.name}
             </Link>
           </li>
