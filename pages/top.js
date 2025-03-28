@@ -41,6 +41,11 @@ const Top = ({ session }) => {
           </Link>
         </div>
         <div>
+          <Link href="/properties" className="link-button">
+            🏠 ペットと一緒に住む物件をシェアしよう！
+          </Link>
+        </div>
+        <div>
           <button
             className="link-button bg-red-500 hover:bg-red-600 text-white"
             onClick={handleLogout}
