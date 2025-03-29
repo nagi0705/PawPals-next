@@ -53,8 +53,8 @@ export default async function handler(req, res) {
 
     // Document作成
     const newProperty = await databases.createDocument(
-      process.env.APPWRITE_DATABASE_ID,           // ← DB ID も環境変数にしておくと安心
-      process.env.APPWRITE_PROPERTIES_COLLECTION_ID,  // ← コレクションIDも
+      '6751bd2800009a139bb8', // データベースID（直書き）
+      '67e6439800093f765fd9', // コレクションID（直書き）
       ID.unique(),
       propertyData
     );
