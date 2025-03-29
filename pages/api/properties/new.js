@@ -6,6 +6,7 @@ import { authOptions } from '../auth/[...nextauth]';
 export default async function handler(req, res) {
   try {
     const session = await getServerSession(req, res, authOptions);
+    
 
     // ログを追加
     console.log('セッション情報:', session);
