@@ -6,7 +6,7 @@ import { authOptions } from '../auth/[...nextauth]';
 export default async function handler(req, res) {
   try {
     const session = await getServerSession(req, res, authOptions);
-    
+
 
     // ログを追加
     console.log('セッション情報:', session);
@@ -58,8 +58,7 @@ export default async function handler(req, res) {
         : [],
       ownerEmail: ownerEmail,
       createdAt: new Date().toISOString(),
-      likes: 0,
-      likedBy: [],
+      
     };
 
     // Document作成
