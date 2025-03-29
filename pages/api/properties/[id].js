@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   const databases = new Databases(client);
 
   try {
-    // 物件のデータを取得
+    // 対象の物件データを取得
     const property = await databases.getDocument(
       process.env.APPWRITE_DATABASE_ID,
       process.env.APPWRITE_PROPERTIES_COLLECTION_ID,
@@ -44,11 +44,17 @@ export default async function handler(req, res) {
         process.env.APPWRITE_PROPERTIES_COLLECTION_ID,
         id,
         {
-          housename,
-          location,
+          housename: housename.trim(),
+          location: location.trim(),
           price: parseInt(price, 10),
-          petsAllowed: petsAllowed.split(',').map(pet => pet.trim()),
-          features: features ? features.split(',').map(feature => feature.trim()) : [],
+          petsAllowed: Array.isArray(petsAllowed)
+            ? petsAllowed.join(', ')
+            : petsAllowed,  // 文字列でもそのまま
+          features: features
+            ? Array.isArray(features)
+              ? features.join(', ')
+              : features
+            : '',
           updatedAt: new Date().toISOString(),
         }
       );
@@ -78,9 +84,8 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('エラー:', error);
 
-    // 物件が見つからない場合
     if (error.code === 404) {
-        return res.status(404).json({ message: '物件が見つかりません' });
+      return res.status(404).json({ message: '物件が見つかりません' });
     }
 
     return res.status(500).json({ message: 'サーバーエラーが発生しました', error: error.message });
