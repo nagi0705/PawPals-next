@@ -1,7 +1,7 @@
 // /pages/properties/index.js
 import { useState, useEffect } from 'react';
 import { Client, Databases } from 'appwrite';
-import Link from 'next/link'; // 追加
+import Link from 'next/link'; 
 
 export default function PropertiesList() {
   const [properties, setProperties] = useState([]);
@@ -31,6 +31,9 @@ export default function PropertiesList() {
 
     fetchProperties();
   }, []);
+   const handleGoHome = () => {
+    router.push("/top"); // トップページに遷移
+  };
 
   // 検索フィルター処理
   // 家賃、所在地、可能なペット、設備などにもマッチさせる
@@ -72,10 +75,15 @@ export default function PropertiesList() {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">物件一覧</h1>
 
-      {/* 物件登録ボタンを追加 */}
       <Link href="/properties/new">
-        <button className="bg-pink-500 text-white p-2 rounded mb-4">
+        <button className="bg-pink-400 text-white p-2 rounded mb-4 text">
           物件登録
+        </button>
+      </Link>
+
+      <Link href="/top">
+        <button className="bg-pink-400 ml-4 text-white p-2 rounded mb-4">
+          トップページに戻る
         </button>
       </Link>
 
@@ -89,8 +97,15 @@ export default function PropertiesList() {
       {error && <p className="text-red-500">Error: {error}</p>}
       <ul>
         {filteredProperties.map(property => (
-          <li key={property.$id} className="border-b py-2">
-            <strong>{property.housename}</strong> - {property.location} - {property.price}円
+          <li key={property.$id} className="border-b py-2 bg-pink-100 rounded-lg text-center">
+            <strong>{property.housename}</strong> - {property.location} - {(property.price / 10000).toFixed(1)}万円
+            {/* 詳細を見るボタンを追加 */}
+            <Link href={`/properties/${property.$id}`}>
+              <button className="bg-pink-400 text-white p-2 rounded ml-2 hover:bg-blue-500">
+                詳細を見る
+              </button>
+            </Link>
+            
           </li>
         ))}
       </ul>
