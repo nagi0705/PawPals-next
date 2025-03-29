@@ -7,6 +7,9 @@ export default async function handler(req, res) {
   try {
     const session = await getServerSession(req, res, authOptions);
 
+    // ログを追加
+    console.log('セッション情報:', session);
+
     // 認証の確認
     if (!session) {
       return res.status(401).json({ message: '認証が必要です' });
@@ -27,10 +30,17 @@ export default async function handler(req, res) {
 
     // Appwriteクライアントの初期化
     const client = new Client()
-      .setEndpoint(process.env.APPWRITE_ENDPOINT)          // ← 環境変数を使う
-      .setProject(process.env.APPWRITE_PROJECT_ID);        // ← 環境変数を使う
+      .setEndpoint(process.env.APPWRITE_ENDPOINT)
+      .setProject(process.env.APPWRITE_PROJECT_ID);
 
     const databases = new Databases(client);
+
+    // ownerEmail を session から取得（undefined 対策あり）
+    const ownerEmail = session?.user?.email;
+    if (!ownerEmail) {
+      console.error('セッションからメールアドレスが取得できません');
+      return res.status(500).json({ message: 'ユーザーのメールアドレスが取得できません' });
+    }
 
     // 登録データの整形
     const propertyData = {
@@ -45,7 +55,7 @@ export default async function handler(req, res) {
           ? features
           : features.split(',').map((f) => f.trim())
         : [],
-      ownerEmail: session.user.email,
+      ownerEmail: ownerEmail,
       createdAt: new Date().toISOString(),
       likes: 0,
       likedBy: [],
@@ -53,8 +63,8 @@ export default async function handler(req, res) {
 
     // Document作成
     const newProperty = await databases.createDocument(
-      '6751bd2800009a139bb8', // データベースID（直書き）
-      '67e6439800093f765fd9', // コレクションID（直書き）
+      '6751bd2800009a139bb8',
+      '67e6439800093f765fd9',
       ID.unique(),
       propertyData
     );
