@@ -10,7 +10,7 @@ const PropertyDetail = ({ property, isOwner }) => {
 
   // 編集用のハンドラ
   const handleEdit = () => {
-    router.push(`/properties/${property.$id}/edit`); // 編集ページに遷移
+    router.push(`/properties/${property.$id}/edit`);
   };
 
   // 削除用のハンドラ
@@ -37,9 +37,8 @@ const PropertyDetail = ({ property, isOwner }) => {
     }
   };
 
-  // 戻るボタンのハンドラ
   const handleBack = () => {
-    router.push('/properties'); // 物件一覧ページに戻る
+    router.push('/properties');
   };
 
   if (error) {
@@ -49,21 +48,21 @@ const PropertyDetail = ({ property, isOwner }) => {
   return (
     <div
       style={{
-        backgroundColor: "#e2ffe2", // グリーンの背景色
+        backgroundColor: "#e2ffe2",
         borderRadius: "12px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
         padding: "2rem",
         margin: "2rem auto",
         maxWidth: "800px",
-        textAlign: "center", // 中央揃え
+        textAlign: "center",
       }}
     >
       <h1 style={{ color: "#f68fe1", marginBottom: "1rem" }}>{property.housename}の詳細</h1>
       <p style={{ fontWeight: "bold" }}>所在地: {property.location}</p>
       <p style={{ fontWeight: "bold" }}>家賃: {(property.price / 10000).toFixed(1)}万円</p>
-      <p style={{ fontWeight: "bold" }}>ペット許可: {property.petsAllowed.join(', ')}</p>
-      <p style={{ fontWeight: "bold" }}>物件の特徴: {property.features.join(', ')}</p>
-                
+      <p style={{ fontWeight: "bold" }}>ペット許可: {property.petsAllowed || '未登録'}</p>
+      <p style={{ fontWeight: "bold" }}>物件の特徴: {property.features || '未登録'}</p>
+
       {isOwner && (
         <div style={{ margin: "1rem 0" }}>
           <button
@@ -110,7 +109,6 @@ const PropertyDetail = ({ property, isOwner }) => {
       >
         物件一覧に戻る
       </button>
-
     </div>
   );
 };
@@ -119,7 +117,6 @@ const PropertyDetail = ({ property, isOwner }) => {
 export async function getServerSideProps(context) {
   const { id } = context.params;
 
-  // セッション情報の取得
   const session = await getServerSession(context.req, context.res, authOptions);
 
   if (!session) {
@@ -137,15 +134,14 @@ export async function getServerSideProps(context) {
   const databases = new Databases(client);
 
   try {
-    // ペットデータの取得
     const response = await databases.getDocument(
-      '6751bd2800009a139bb8', // データベースID
-      '67e6439800093f765fd9', // コレクションID
-      id // 物件ID
+      '6751bd2800009a139bb8',
+      '67e6439800093f765fd9',
+      id
     );
 
     const property = response;
-    const isOwner = property.ownerEmail === session.user.email; // オーナーかどうかの判定
+    const isOwner = property.ownerEmail === session.user.email;
 
     return {
       props: { property, isOwner },
@@ -153,7 +149,7 @@ export async function getServerSideProps(context) {
   } catch (error) {
     console.error(error);
     return {
-    notFound: true, // 物件が見つからない場合は404
+      notFound: true,
     };
   }
 }
