@@ -7,7 +7,6 @@ export default async function handler(req, res) {
   try {
     const session = await getServerSession(req, res, authOptions);
 
-
     // ログを追加
     console.log('セッション情報:', session);
 
@@ -49,16 +48,15 @@ export default async function handler(req, res) {
       location: location.trim(),
       price: Math.floor(Number(price)),
       petsAllowed: Array.isArray(petsAllowed)
-        ? petsAllowed
-        : petsAllowed.split(',').map((pet) => pet.trim()),
+        ? petsAllowed.join(',')
+        : petsAllowed.split(',').map((pet) => pet.trim()).join(','),
       features: features
         ? Array.isArray(features)
-          ? features
-          : features.split(',').map((f) => f.trim())
-        : [],
+          ? features.join(',')
+          : features.split(',').map((f) => f.trim()).join(',')
+        : '',
       ownerEmail: ownerEmail,
       createdAt: new Date().toISOString(),
-      
     };
 
     // Document作成
