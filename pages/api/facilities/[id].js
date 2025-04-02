@@ -8,15 +8,15 @@ export default async function handler(req, res) {
   const { id } = req.query;
 
   const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT_ID);
+    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setProject('675183a100255c6c9a3f');
   const databases = new Databases(client);
 
   try {
     // 取得対象の施設
     const facility = await databases.getDocument(
-      process.env.APPWRITE_DATABASE_ID,
-      process.env.APPWRITE_FACILITIES_COLLECTION_ID,
+      '6751bd2800009a139bb8',
+      '67e8e07100164c327c35',
       id
     );
 
@@ -41,16 +41,15 @@ export default async function handler(req, res) {
       }
 
       const updated = await databases.updateDocument(
-        process.env.APPWRITE_DATABASE_ID,
-        process.env.APPWRITE_FACILITIES_COLLECTION_ID,
+        '6751bd2800009a139bb8',
+        '67e8e07100164c327c35',
         id,
         {
           name: name.trim(),
           location: location.trim(),
           type: type || '',
-          petsAllowed: petsAllowed.trim(),
-          features: features || '',
-          updatedAt: new Date().toISOString(),
+          petsAllowed: Array.isArray(petsAllowed) ? petsAllowed.join(', ') : petsAllowed,
+          features: features ? (Array.isArray(features) ? features.join(', ') : features) : ''
         }
       );
 
@@ -59,8 +58,8 @@ export default async function handler(req, res) {
 
     if (req.method === 'DELETE') {
       await databases.deleteDocument(
-        process.env.APPWRITE_DATABASE_ID,
-        process.env.APPWRITE_FACILITIES_COLLECTION_ID,
+        '6751bd2800009a139bb8',
+        '67e8e07100164c327c35',
         id
       );
 
